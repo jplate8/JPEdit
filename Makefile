@@ -1,5 +1,5 @@
 all:
-	clang++ src/*.cpp -o jpedit
+	clang++ src/*.cpp -lncurses -o jpedit
 
 clean:
 	rm jpedit
