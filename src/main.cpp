@@ -1,11 +1,13 @@
 #include <iostream>
+#include <vector>
 
 using namespace std;
 
 int main(int argc, char *arvg[]) {
+  vector<string> lines;
   string line;
   while (getline(cin, line)) {
-    cout << line << endl;
+    lines.push_back(line);
   }
 
   cout << "Y U NO LIKE ECHO? " << endl;
