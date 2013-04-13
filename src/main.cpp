@@ -3,9 +3,9 @@
 using namespace std;
 
 int main(int argc, char *arvg[]) {
-  string word;
-  while (getline(cin, word)) {
-    cout << word << endl;
+  string line;
+  while (getline(cin, line)) {
+    cout << line << endl;
   }
 
   cout << "Y U NO LIKE ECHO? " << endl;
