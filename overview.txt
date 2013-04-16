@@ -1,0 +1,22 @@
+Overview of classes to be implemented
+
+Window_manager
+  has:
+    - bunch of Windows
+  does:
+    - tracks user interaction with multiple Windows
+
+Window
+  has:
+    - Buffer of file currently being edited
+  does:
+    - displays Buffer to screen
+    - allows user to edit Buffer
+
+Buffer
+  has:
+    - the file that is being edited
+    - set of changes from last write to file
+  does:
+    - writes Buffer state to file
+    - accepts and applies changes to the Buffer state
