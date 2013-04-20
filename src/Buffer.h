@@ -2,20 +2,29 @@
 //
 // Represents an editing session with a file.
 
+#include <fstream>
+#include <list>
+
 class Buffer {
     // TODO: add friend method for updating buffer contents
 
   public:
     // default constructor:
     // does not bound to a file.
-    // TODO: call other constructor with
-    //  special value that represents an unbound file.
+    Buffer();
 
     // constructor:
     // binds to the given file.
-    // TODO: figure out how to File IO.
-  private:
-    // TODO: figure out what to use to represent file state
+    explicit Buffer(const std::string &p);
 
-    // TODO: figure out how to file pointer, or something
-}
+    // write the buffer to the file.
+    // true on success.
+    bool write();
+  private:
+    // current state of this Buffer's representation of its file.
+    std::list<std::string> filestate;
+
+    // file being edited
+    std::ofstream file;
+    std::string path;
+};

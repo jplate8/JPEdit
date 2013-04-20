@@ -3,9 +3,25 @@
 #include <ncurses.h>
 #include <cstring>
 
+#include "Buffer.h"
+
 using namespace std;
 
 int main(int argc, char *argv[]) {
+  if (argc > 1) {
+    Buffer buff(argv[1]);
+    // write unedited buffer
+    buff.write();
+  } else {
+    Buffer buff;
+    buff.write();
+    cout << "pass a file as a parameter" << std::endl;
+  }
+
+  return 0;
+}
+
+void startEditor() {
   char mesg[] = "welcome to JPEdit. It sucks.";
   char input[80];
   int row, col;
@@ -40,17 +56,4 @@ int main(int argc, char *argv[]) {
 
   // deallocate screen stuff. get back normal terminal mode.
   endwin();
-  return 0;
-
-  /*
-  vector<string> lines;
-  string line;
-  while (getline(cin, line)) {
-    lines.push_back(line);
-  }
-
-  cout << "Y U NO LIKE ECHO? " << endl;
-
-  return 0;
-  */
 }
