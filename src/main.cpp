@@ -7,7 +7,10 @@
 
 using namespace std;
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
+  Window_manager wm;
+
   if (argc > 1) {
     Buffer buff(argv[1]);
     // write unedited buffer

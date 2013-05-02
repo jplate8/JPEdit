@@ -6,11 +6,12 @@
 #include <list>
 
 class Buffer {
-    // TODO: add friend method for updating buffer contents
-
+  //TODO: decide how to implement set of Buffer-specific options.
+  //  decided: use a lookup table.
+  //  See Line.h for ideas on how to use it.
   public:
     // default constructor:
-    // does not bound to a file.
+    // does not bind to a file.
     Buffer();
 
     // constructor:
@@ -20,11 +21,17 @@ class Buffer {
     // write the buffer to the file.
     // true on success.
     bool write();
+
+    // set the path to which this buffer will write.
+    void set_path(const std::string &p);
+
+    // current line being edited.
+    Line::iterator line;
   private:
     // current state of this Buffer's representation of its file.
-    std::list<std::string> filestate;
+    std::list<Line> lines;
 
-    // file being edited
+    // file being edited.
     std::ofstream file;
     std::string path;
 };

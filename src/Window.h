@@ -2,17 +2,23 @@
 //
 // forms an interaction between user interaction and a file Buffer.
 
-class Window {
-  public:
-    // default constructor:
-    // creates empty buffer
-    Window() = default;
+#include <ncurses.h>
 
+class Window {
+  // window managers can set the active ncurses window of windows.
+  friend Window_manager::set_window(Window &window, WINDOW *active);
+
+  public:
     // constructor:
-    // shows the given buffer
-    Window(Buffer &b) front(b) { }
+    // uses given ncurses window.
+    // shows the given buffer.
+    Window(WINDOW *active, Buffer *b);
 
   private:
     // buffer currently shown
     Buffer *front;
+
+    // All operations will be performed using the active ncursrs window.
+    // can be set by a window manager.
+    WINDOW* active_window;
 };

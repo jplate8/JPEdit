@@ -3,8 +3,10 @@ Overview of classes to be implemented
 Window_manager
   has:
     - bunch of Windows
+    - bunch of Buffers
   does:
     - tracks user interaction with multiple Windows
+    - assigns Windows to Buffers
 
 Window
   has:
@@ -17,6 +19,7 @@ Buffer
   has:
     - the file that is being edited
     - set of changes from last write to file
+    - set of Buffer-specific options
   does:
     - writes Buffer state to file
     - accepts and applies changes to the Buffer state

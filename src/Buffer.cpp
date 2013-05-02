@@ -14,15 +14,15 @@ Buffer::Buffer() : Buffer("") { }
 
 // constructor:
 // binds to the given file.
-Buffer::Buffer(const std::string &p) : path(p)
+Buffer::Buffer(const std::string &p) : path(p), line(lines.begin())
 {
   // initializes Buffer state to be existing file state, if one exists.
   std::ifstream state_init(path);
-  // read all existing lines into filestate
+  // read all existing lines into Buffer.
   std::string line;
   std::cout << "reading lines from file: " << path << "\n";
   while (getline(state_init, line)) {
-    filestate.push_back(line);
+    lines.push_back(line);
     std::cout << line << "\n";
   }
   std::cout << "done reading file." << std::endl;
@@ -40,9 +40,9 @@ bool Buffer::write()
     return false;
   }
 
-  int size = filestate.size();
+  int size = lines.size();
   int lineindex = 0;
-  for (std::string line : filestate) {
+  for (std::string line : lines) {
     file << line;
     if (lineindex != size - 1) {
       file << "\n";
@@ -54,3 +54,6 @@ bool Buffer::write()
   return true;
 }
 
+void Buffer::set_path(const std::string &p) {
+  path = p;
+}

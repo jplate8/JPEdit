@@ -35,14 +35,17 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +17 src/Window.h
-badd +21 src/Buffer.h
-badd +26 src/Window_manager.h
-badd +1 overview.txt
-badd +1 src/Buffer.cpp
-badd +0 src/main.cpp
+badd +8 src/Window.h
+badd +29 src/Buffer.h
+badd +28 src/Window_manager.h
+badd +24 overview.txt
+badd +45 src/Buffer.cpp
+badd +12 src/main.cpp
+badd +12 src/Window.cpp
+badd +53 src/Window_manager.cpp
+badd +99 src/Line.h
 args src/Window.h
-edit src/main.cpp
+edit src/Buffer.h
 set splitbelow splitright
 wincmd _ | wincmd |
 split
@@ -63,9 +66,9 @@ nnoremap <buffer> 	 :call search('\[[0-9]*:[^\]]*\]'):<BS>
 nnoremap <buffer> j gj
 nnoremap <buffer> k gk
 nnoremap <buffer> p :wincmd p:<BS>
-nnoremap <buffer> <S-Tab> :call search('\[[0-9]*:[^\]]*\]','b'):<BS>
-nnoremap <buffer> <Up> gk
 nnoremap <buffer> <Down> gj
+nnoremap <buffer> <Up> gk
+nnoremap <buffer> <S-Tab> :call search('\[[0-9]*:[^\]]*\]','b'):<BS>
 let &cpo=s:cpo_save
 unlet s:cpo_save
 setlocal keymap=
@@ -273,12 +276,12 @@ setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
-let s:l = 1 - ((0 * winheight(0) + 18) / 36)
+let s:l = 11 - ((10 * winheight(0) + 18) / 36)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-1
-normal! 0
+11
+normal! 043l
 wincmd w
 2wincmd w
 exe '1resize ' . ((&lines * 1 + 20) / 40)
