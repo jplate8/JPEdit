@@ -1,6 +1,17 @@
+#ifndef WINDOW_MANAGER_H
+#define WINDOW_MANAGER_H
+
 // Window-manager.h
 //
 // Represents a set of windows and tracks user interatcoin with them.
+
+#include <string>
+#include <vector>
+#include <ncurses.h>
+
+class Window;
+class Buffer;
+
 
 class Window_manager {
   public:
@@ -32,17 +43,19 @@ class Window_manager {
     
   private:
     // set the window's active ncurses window.
-    void set_window(Window &window, WINDOW *new_active);
+    //void set_window(Window &window, WINDOW *new_active);
 
     // set the window's front buffer.
     void set_buffer(Window &window, Buffer *new_front);
 
     // all the Windows managed by this manager
-    vector<Window> windows;
+    std::vector<Window> windows;
 
     // all the Buffers that this manager's Windows can be assigned to.
-    vector<Buffer> buffers;
+    std::vector<Buffer> buffers;
 
     // currently selected window
     Window *selected;
-}
+};
+
+#endif /* WINDOW_MANAGER_H */

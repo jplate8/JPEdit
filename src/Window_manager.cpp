@@ -2,6 +2,10 @@
 //
 // Represents a set of windows and tracks user interatcoin with them.
 
+#include "Window_manager.h"
+#include "Window.h"
+#include "Buffer.h"
+
 // default constructor:
 // creates a new Window with empty Buffer,
 // and sets it as currently selected.
@@ -13,7 +17,7 @@ Window_manager::Window_manager() : Window_manager("") { }
 Window_manager::Window_manager(const std::string &path)
 {
   open(path);
-  selected = windows[0];
+  selected = &windows[0];
 }
 
 // select the Window with the given ID
@@ -22,7 +26,7 @@ bool Window_manager::select(const int &window_id)
   if (windows.size() < window_id + 1) {
     return false;
   }
-  selected = windows[window_id];
+  selected = &windows[window_id];
   return true;
 }
 
@@ -33,10 +37,11 @@ void Window_manager::add_window(Window &new_window)
 }
 
 // open buffer for given path and bring it to front of selected window.
-void Window_manager::open(const std::string &path)
+int Window_manager::open(const std::string &path)
 {
   //TODO: check that no buffer exists for requested file.
-  buffers.push_back(Buffer buf(path));
+  Buffer buf(path);
+  buffers.push_back(buf);
   return buffers.size() - 1;
 }
 
@@ -46,15 +51,16 @@ void Window_manager::open(const std::string &path)
 bool Window_manager::relinuish(Window *relinquisher, const int &new_window_id)
 {
   if (relinquisher != selected ||
-      windows.size() < window_id + 1) {
+      windows.size() < new_window_id + 1) {
     return false;
   }
-  selected = windows[new_window_id];
+  selected = &windows[new_window_id];
   return true;
 }
-
+/*
 // set the window's active ncurses window.
 void Window_manager::set_window(Window &window, WINDOW *new_active)
 {
-  window.active = new_active
+  window.active_window = new_active;
 }
+*/

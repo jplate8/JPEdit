@@ -1,12 +1,20 @@
+#ifndef WINDOW_H
+#define WINDOW_H
+
 // Window.h
 //
 // forms an interaction between user interaction and a file Buffer.
 
 #include <ncurses.h>
 
+#include "Window_manager.h"
+#include "Line.h"
+
+class Buffer;
+
 class Window {
-  // window managers can set the active ncurses window of windows.
-  friend Window_manager::set_window(Window &window, WINDOW *active);
+  // window managers can set the active ncurses window.
+  //friend void Window_manager::set_window(Window &window, WINDOW *active);
 
   public:
     // constructor:
@@ -15,6 +23,15 @@ class Window {
     Window(WINDOW *active, Buffer *b);
 
   private:
+    // do edit mode:
+    // interpret user input while updating buffer and screen.
+    void edit_text();
+
+    // reach into the front Buffer and get their insides.
+    std::list<Line> &front_lines();
+    std::list<Line>::iterator &front_line();
+    Line::iterator &front_cursor();
+
     // buffer currently shown
     Buffer *front;
 
@@ -22,3 +39,5 @@ class Window {
     // can be set by a window manager.
     WINDOW* active_window;
 };
+
+#endif /* WINDOW_H */

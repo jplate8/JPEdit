@@ -3,12 +3,22 @@
 #include <ncurses.h>
 #include <cstring>
 
+#include "Window_manager.h"
+#include "Window.h"
 #include "Buffer.h"
 
 using namespace std;
 
 int main(int argc, char *argv[])
 {
+  // ncurses pre-configuration:
+  // turn off echoing
+  noecho();
+  // make keypresses immediately. let interrupt sequences still work.
+  cbreak();
+  // set timeout for ESC
+  timeout(25);
+
   Window_manager wm;
 
   if (argc > 1) {
