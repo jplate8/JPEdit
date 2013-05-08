@@ -23,7 +23,7 @@ class Window_manager {
     // constructor:
     // creates a new window with a Buffer for the given file path,
     // and sets it as currently selected.
-    Window_manager(const std::string &path);
+    explicit Window_manager(const std::string &path);
 
     // select the Window with the given ID.
     // true on success.
