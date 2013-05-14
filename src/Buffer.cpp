@@ -36,6 +36,22 @@ Buffer::Buffer(const std::string &p) : path(p)
   cursor = very_first_char();
 }
 
+// constructor:
+// takes topmost line that was changed,
+// number of lines that were changed, and
+// starting and final positions of the cursor.
+Buffer::Changeset::Changeset(Line_list::iterator topln,
+                             Line_list::difference_type lines_edited,
+                             Point orig,
+                             Point final) :
+  cursor_orig(orig), cursor_final(final), top(topln)
+{
+  while (lines_edited > 0) {
+    changed.emplace_back(begin(*topln), end(*topln));
+    ++topln;
+  }
+}
+
 bool Buffer::write()
 {
   std::ofstream file;
@@ -67,49 +83,60 @@ void Buffer::set_path(const std::string &p)
 }
 
 // insert the given character before the cursor.
-Buffer::Changelog Buffer::insert(const char &character)
+Buffer::Changeset Buffer::insert(const char &character)
 {
   //TODO: update this when line length limiting is implemented.
-  (*line).insert(cursor, character);
-  return Changelog(line, 0);
+  line->insert(cursor, character);
+  auto orig_pos = cursor_pos;
+  ++cursor_pos.x;
+  return Changeset(line, 1, orig_pos, cursor_pos);
 }
 
 // place cursor at beginning of line above.
 // stops at first line.
 // returns number of lines moved up.
-Buffer::Changelog Buffer::cursormv_up(const int &num_lines /* = 1 */)
+Buffer::Changeset Buffer::cursormv_up(const int &num_lines /* = 1 */)
 {
   Line_list::difference_type moves = 0;
-  auto first = lines.begin();
+  auto orig_pos = cursor_pos;
+  auto first = begin(lines);
   while(moves < num_lines && line != first) {
     --line;
+    --cursor_pos.y;
     ++moves;
   }
   cursor = local_first_char();
-  return Changelog(line, moves);
+  cursor_pos.x = 0;
+  // cursor positions reversed because things change upwards.
+  return Changeset(line, moves, cursor_pos, orig_pos);
 }
 
 // place cursor at beginning of line below.
 // stops at last line.
 // returns number of lines moved down.
-Buffer::Changelog Buffer::cursormv_down(const int &num_lines /* = 1 */)
+Buffer::Changeset Buffer::cursormv_down(const int &num_lines /* = 1 */)
 {
   Line_list::difference_type moves = 0;
-  auto end = --(lines.end());
-  while(moves < num_lines && line != end) {
+  auto orig_pos = cursor_pos;
+  auto endln = --end(lines);
+  while(moves < num_lines && line != endln) {
     ++line;
     ++moves;
+    ++cursor_pos.y;
   }
   cursor = local_first_char();
-  return Changelog(line, moves);
+  cursor_pos.x = 0;
+  return Changeset(line, moves, orig_pos, cursor_pos);
 }
 
 // move the cursor left, possibly wrapping to previous line.
 // Stops at first position of first line.
 // returns number of positions moved left.
-Buffer::Changelog Buffer::cursormv_left(const int &num_moves /* = 1 */)
+Buffer::Changeset Buffer::cursormv_left(const int &num_moves /* = 1 */)
 {
   Line_list::difference_type taken = 0;
+  int wraps = 0;
+  auto orig_pos = cursor_pos;
   // very first character
   auto first = very_first_char();
   // first character of this line
@@ -117,6 +144,7 @@ Buffer::Changelog Buffer::cursormv_left(const int &num_moves /* = 1 */)
   while (taken < num_moves && cursor != first) {
     while (cursor != local_first) {
       --cursor;
+      --cursor_pos.x;
       ++taken;
     }
     // if should wrap left, and can
@@ -124,18 +152,24 @@ Buffer::Changelog Buffer::cursormv_left(const int &num_moves /* = 1 */)
       --line;
       local_first = local_first_char();
       cursor = local_end_char();  // wrap over newline, but not next char.
+      --cursor_pos.y;
+      cursor_pos.x = line->size() - 1;
       ++taken;
+      ++wraps;
     }
   }
-  return Changelog(line, taken);;
+  // cursor positions reversed because things change upwards.
+  return Changeset(line, wraps + 1, cursor_pos, orig_pos);
 }
 
 // move the cursor right, possibly wrapping to next line.
 // Stops after last position of last line.
 // returns number of positions moved right.
-Buffer::Changelog Buffer::cursormv_right(const int &num_moves /* = 1 */)
+Buffer::Changeset Buffer::cursormv_right(const int &num_moves /* = 1 */)
 {
   Line_list::difference_type taken = 0;
+  int wraps = 0;
+  auto orig_pos = cursor_pos;
   // after very last character
   auto last = very_end_char();
   // after last character of this line
@@ -143,6 +177,7 @@ Buffer::Changelog Buffer::cursormv_right(const int &num_moves /* = 1 */)
   while (taken < num_moves && cursor != last) {
     while (cursor != local_last) {
       ++cursor;
+      ++cursor_pos.x;
       ++taken;
     }
     // if should wrap right, and can
@@ -150,75 +185,114 @@ Buffer::Changelog Buffer::cursormv_right(const int &num_moves /* = 1 */)
       ++line;
       local_last = local_end_char();
       cursor = local_first_char();  // wrap over newline, but not next char.
+      ++cursor_pos.y;
+      cursor_pos.x = 0;
+      ++wraps;
     }
   }
-  return Changelog(line, taken);;
+  return Changeset(line, wraps + 1, orig_pos, cursor_pos);
 }
 
 // perform necessary actions to handle pressing of BACKSPACE.
 // return numbers of backspace operations performed successfully.
-Buffer::Changelog Buffer::do_backspace(const int &num_presses /* = 1 */)
+Buffer::Changeset Buffer::do_backspace(const int &num_presses /* = 1 */)
 {
   Line_list::difference_type num_done = 0;
+  Changeset ret(line, 0, cursor_pos, cursor_pos);
   auto first = very_first_char();
   while (cursor != first && num_done < num_presses) {
-    cursormv_left();
-    do_delete();
+    ret.combine(cursormv_left());
+    ret.combine(do_delete());
   }
-  return Changelog(line, num_done);
+  return ret;
 }
 
 // perform necessary actions to handle pressing of DELETE.
 // returns number of delete operations performed successfully.
-Buffer::Changelog Buffer::do_delete(const int &num_presses /* = 1 */)
+Buffer::Changeset Buffer::do_delete(const int &num_presses /* = 1 */)
 {
   Line_list::difference_type num_done = 0;
-  auto end = very_end_char();
-  while (cursor != end && num_done < num_presses) {
+  int wraps = 0;
+  auto orig_pos = cursor_pos;
+  auto endln = very_end_char();
+  while (cursor != endln && num_done < num_presses) {
     if (cursor == local_end_char()) {
       // delete line break: join line with next
       auto next = line;
       ++next;
-      (*line).insert(cursor, (*next).begin(), (*next).end());
+      line->insert(cursor, begin(*next), end(*next));
     } else {
-      curr_line().erase(cursor);
+      line->erase(cursor);
       // cursor ends up on element after one erased
     }
     ++num_done;
   }
-  return Changelog(line, num_done);
+  return Changeset(line, wraps, orig_pos, cursor_pos);
 }
 
 // perform necessary actions to handle pressing of ENTER.
 // insert a line break before character under cursor.
-Buffer::Changelog Buffer::do_enter(const int &num_presses /* = 1 */)
+Buffer::Changeset Buffer::do_enter(const int &num_presses /* = 1 */)
 {
   Line_list::difference_type num_done = 0;
+  auto orig_pos = cursor_pos;
   while (num_done < num_presses) {
     auto curr_end = local_end_char();
     // cursor can never be past end of line, so always safe to increment.
     ++line;
+    ++cursor_pos.y;
     // insert line after cursor's one that has all elements from
     // current cursor position to end of line.
     lines.emplace(line, cursor, curr_end);
     cursor = local_first_char();
     ++num_done;
   }
-  return Changelog(line, num_done);
+  cursor_pos.x = 0;
+  return Changeset(line, num_done, orig_pos, cursor_pos);
 }
 
 // perform necessary actions to handle pressing of HOME.
 // place cursor on first character of line.
-Buffer::Changelog Buffer::do_home()
+Buffer::Changeset Buffer::do_home()
 {
+  auto orig_pos = cursor_pos;
   cursor = local_first_char();
-  return Changelog(line,0);
+  cursor_pos.x = 0;
+  return Changeset(line, 0, orig_pos, cursor_pos);
 }
 
 // perform necessary actions to handle pressing of END.
 // place cursor after last character of line.
-Buffer::Changelog Buffer::do_end()
+Buffer::Changeset Buffer::do_end()
 {
+  auto orig_pos = cursor_pos;
   cursor = local_end_char();
-  return Changelog(line,0);
+  cursor_pos.x = line->size() - 1;
+  return Changeset(line, 0, orig_pos, cursor_pos);
+}
+
+// combine two changelogs.
+// Assumes that they either overlap or are adjacent.
+void Buffer::Changeset::combine(const Changeset &other)
+{
+  // if stuff to add on top
+  if (cursor_orig.y > other.cursor_final.y) {
+    auto ln = other.top;
+    cursor_orig = other.cursor_orig;
+    while (ln != top) {
+      changed.emplace_front(begin(*ln), end(*ln));
+    }
+  }
+
+  // if stuff to add on bottom
+  if (cursor_final.y < other.cursor_final.y) {
+    auto endln = top;
+    for (int i = cursor_orig.y; i <= cursor_final.y; ++i) {
+      ++endln;
+    }
+
+    while (endln != other.top) {
+      changed.emplace_back(begin(*endln), end(*endln));
+    }
+  }
 }

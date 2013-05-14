@@ -10,6 +10,7 @@
 #include <list>
 
 #include "Window.h"
+#include "Point.h"
 //#include "Line.h"
 
 class Buffer {
@@ -34,7 +35,7 @@ class Buffer {
     explicit Buffer(const std::string &p);
 
     // set of changes made by Buffer edit commands.
-    class Changelog;
+    struct Changeset;
 
     // write the buffer to the file.
     // true on success.
@@ -44,52 +45,49 @@ class Buffer {
     void set_path(const std::string &p);
 
     // insert the given character before the cursor.
-    Changelog insert(const char &character);
+    Changeset insert(const char &character);
 
     // place cursor at beginning of line above.
     // stops at first line.
     // returns number of lines moved up.
-    Changelog cursormv_up(const int &num_lines = 1);
+    Changeset cursormv_up(const int &num_lines = 1);
 
     // place cursor at beginning of line below.
     // stops at last line.
     // returns number of lines moved down.
-    Changelog cursormv_down(const int &num_lines = 1);
+    Changeset cursormv_down(const int &num_lines = 1);
 
     // move the cursor left, possibly wrapping to previous line.
     // Stops at first position of first line.
     // returns number of positions moved left.
-    Changelog cursormv_left(const int &num_moves = 1);
+    Changeset cursormv_left(const int &num_moves = 1);
 
     // move the cursor right, possibly wrapping to next line.
     // Stops after last position of last line.
     // returns number of positions moved right.
-    Changelog cursormv_right(const int &num_moves = 1);
+    Changeset cursormv_right(const int &num_moves = 1);
 
     // perform necessary actions to handle pressing of BACKSPACE.
     // return numbers of backspace operations performed successfully.
-    Changelog do_backspace(const int &num_presses = 1);
+    Changeset do_backspace(const int &num_presses = 1);
 
     // perform necessary actions to handle pressing of DELETE.
     // returns number of delete operations performed successfully.
-    Changelog do_delete(const int &num_presses = 1);
+    Changeset do_delete(const int &num_presses = 1);
 
     // perform necessary actions to handle pressing of ENTER.
     // insert a line break before character under cursor.
-    Changelog do_enter(const int &num_presses = 1);
+    Changeset do_enter(const int &num_presses = 1);
 
     // perform necessary actions to handle pressing of HOME.
     // place cursor on first character of line.
-    Changelog do_home();
+    Changeset do_home();
     
     // perform necessary actions to handle pressing of END.
     // place cursor after last character of line.
-    Changelog do_end();
+    Changeset do_end();
 
   private:
-    // current line object being edited, as opposed to iterator.
-    Line &curr_line();
-
     // position of first character on current line.
     Line::iterator local_first_char();
 
@@ -110,62 +108,66 @@ class Buffer {
 
     // cursor position on current line.
     Line::iterator cursor;
+    Point cursor_pos;
 
     // file being edited.
     //std::ofstream file;
     std::string path;
 };
 
-class Buffer::Changelog {
-  public:
-    // constructor.
-    //
-    // takes line that cursor ended on,
-    // number of lines cursor has moved.
-    Changelog(Line_list::iterator end,
-                      Line_list::difference_type diff)
-      : ending_line(end), line_diff(diff) { }
+struct Buffer::Changeset {
+  // constructor:
+  // takes topmost line that was changed,
+  // number of lines that were changed, and
+  // starting and final positions of the cursor.
+  Changeset(Line_list::iterator topln,
+      Line_list::difference_type lines_edited,
+      Point orig,
+      Point final);
 
-    // line that cursor ended on.
-    Line_list::iterator ending_line;
+  // include another Changeset's information in this one.
+  // Assumes that they either overlap or are adjacent.
+  void combine(const Changeset &other);
 
-    // number of lines cursor moved.
-    Line_list::difference_type line_diff;
+  // changed lines.
+  std::list<std::string> changed;
+
+  // starting (top) and final (bottom) positions of the cursor.
+  Point cursor_orig;
+  Point cursor_final;
+
+  private:
+    // used for combining.
+    Line_list::iterator top;
 };
-
-// current line object being edited, as opposed to iterator.
-inline Line &Buffer::curr_line()
-{
-  return *line;
-}
 
 // position of first character on first line.
 inline Line::iterator Buffer::very_first_char()
 {
-  return (*lines.begin()).begin();
+  return begin(*begin(lines));
 }
 
 // position AFTER last character on last line.
 inline Line::iterator Buffer::very_end_char()
 {
   // last line iterator
-  auto last_line = lines.begin() == lines.end() ?
-              lines.end() :
-              --(lines.end());
+  auto last_line = begin(lines) == end(lines) ?
+                   end(lines) :
+                   --end(lines);
   // after very last character
-  return (*last_line).end();
+  return end(*last_line);
 }
 
 // position of first character on current line.
 inline Line::iterator Buffer::local_first_char()
 {
-  return curr_line().begin();
+  return begin(*line);
 }
 
 // position AFTER last character on current line.
 inline Line::iterator Buffer::local_end_char()
 {
-  return curr_line().end();
+  return end(*line);
 }
 
 #endif /* BUFFER_H */
