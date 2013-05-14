@@ -126,7 +126,6 @@ struct Buffer::Changeset {
       Point final);
 
   // include another Changeset's information in this one.
-  // Assumes that they either overlap or are adjacent.
   void combine(const Changeset &other);
 
   // changed lines.

@@ -271,8 +271,7 @@ Buffer::Changeset Buffer::do_end()
   return Changeset(line, 0, orig_pos, cursor_pos);
 }
 
-// combine two changelogs.
-// Assumes that they either overlap or are adjacent.
+// include another Changeset's information in this one.
 void Buffer::Changeset::combine(const Changeset &other)
 {
   // if stuff to add on top
