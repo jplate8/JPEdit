@@ -14,9 +14,6 @@
 //#include "Line.h"
 
 class Buffer {
-  //friend std::list<Line> &Window::front_lines();
-  //friend std::list<Line>::iterator &Window::front_line();
-  //friend Line::iterator &Window::front_cursor();
   friend class Window;
   
   //TODO: decide how to implement set of Buffer-specific options.
@@ -111,7 +108,6 @@ class Buffer {
     Point cursor_pos;
 
     // file being edited.
-    //std::ofstream file;
     std::string path;
 };
 
@@ -145,6 +141,8 @@ inline Line::iterator Buffer::very_first_char()
 {
   return begin(*begin(lines));
 }
+
+// inline function definitions
 
 // position AFTER last character on last line.
 inline Line::iterator Buffer::very_end_char()

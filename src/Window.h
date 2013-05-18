@@ -14,7 +14,7 @@ class Buffer;
 
 class Window {
   // window managers can set the active ncurses window.
-  //friend void Window_manager::set_window(Window &window, WINDOW *active);
+  friend class Window_manager;
 
   public:
     // constructor:
@@ -26,11 +26,6 @@ class Window {
     // do edit mode:
     // interpret user input while updating buffer and screen.
     void edit_text();
-
-    // reach into the front Buffer and get their insides.
-    std::list<Line> &front_lines();
-    std::list<Line>::iterator &front_line();
-    Line::iterator &front_cursor();
 
     // buffer currently shown
     Buffer *front;
