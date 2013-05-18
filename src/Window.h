@@ -7,10 +7,10 @@
 
 #include <ncurses.h>
 
-#include "Window_manager.h"
+#include "Buffer.h"
 #include "Line.h"
 
-class Buffer;
+class Window_manager;
 
 class Window {
   // window managers can set the active ncurses window.
@@ -22,13 +22,17 @@ class Window {
     // shows the given buffer.
     Window(WINDOW *active, Buffer *b);
 
-  private:
     // do edit mode:
     // interpret user input while updating buffer and screen.
     void edit_text();
 
+  private:
     // buffer currently shown
     Buffer *front;
+
+    // choose and execute appropriate buffer-editing function.
+    // returns nullptr on ESC.
+    std::unique_ptr<Buffer::Changeset> do_keystroke(const int &key);
 
     // All operations will be performed using the active ncursrs window.
     // can be set by a window manager.

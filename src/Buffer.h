@@ -7,11 +7,13 @@
 
 #include <string>
 #include <fstream>
+#include <memory>
 #include <list>
 
-#include "Window.h"
 #include "Point.h"
-//#include "Line.h"
+#include "Line.h"
+
+class Window;
 
 class Buffer {
   friend class Window;
@@ -42,47 +44,47 @@ class Buffer {
     void set_path(const std::string &p);
 
     // insert the given character before the cursor.
-    Changeset insert(const char &character);
+    std::unique_ptr<Changeset> insert(const int &character);
 
     // place cursor at beginning of line above.
     // stops at first line.
     // returns number of lines moved up.
-    Changeset cursormv_up(const int &num_lines = 1);
+    std::unique_ptr<Changeset> cursormv_up(const int &num_lines = 1);
 
     // place cursor at beginning of line below.
     // stops at last line.
     // returns number of lines moved down.
-    Changeset cursormv_down(const int &num_lines = 1);
+    std::unique_ptr<Changeset> cursormv_down(const int &num_lines = 1);
 
     // move the cursor left, possibly wrapping to previous line.
     // Stops at first position of first line.
     // returns number of positions moved left.
-    Changeset cursormv_left(const int &num_moves = 1);
+    std::unique_ptr<Changeset> cursormv_left(const int &num_moves = 1);
 
     // move the cursor right, possibly wrapping to next line.
     // Stops after last position of last line.
     // returns number of positions moved right.
-    Changeset cursormv_right(const int &num_moves = 1);
+    std::unique_ptr<Changeset> cursormv_right(const int &num_moves = 1);
 
     // perform necessary actions to handle pressing of BACKSPACE.
     // return numbers of backspace operations performed successfully.
-    Changeset do_backspace(const int &num_presses = 1);
+    std::unique_ptr<Changeset> do_backspace(const int &num_presses = 1);
 
     // perform necessary actions to handle pressing of DELETE.
     // returns number of delete operations performed successfully.
-    Changeset do_delete(const int &num_presses = 1);
+    std::unique_ptr<Changeset> do_delete(const int &num_presses = 1);
 
     // perform necessary actions to handle pressing of ENTER.
     // insert a line break before character under cursor.
-    Changeset do_enter(const int &num_presses = 1);
+    std::unique_ptr<Changeset> do_enter(const int &num_presses = 1);
 
     // perform necessary actions to handle pressing of HOME.
     // place cursor on first character of line.
-    Changeset do_home();
+    std::unique_ptr<Changeset> do_home();
     
     // perform necessary actions to handle pressing of END.
     // place cursor after last character of line.
-    Changeset do_end();
+    std::unique_ptr<Changeset> do_end();
 
   private:
     // position of first character on current line.

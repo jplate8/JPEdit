@@ -83,19 +83,24 @@ void Buffer::set_path(const std::string &p)
 }
 
 // insert the given character before the cursor.
-Buffer::Changeset Buffer::insert(const char &character)
+std::unique_ptr<Buffer::Changeset>
+  Buffer::insert(const int &character)
 {
   //TODO: update this when line length limiting is implemented.
   line->insert(cursor, character);
   auto orig_pos = cursor_pos;
   ++cursor_pos.x;
-  return Changeset(line, 1, orig_pos, cursor_pos);
+  
+  std::unique_ptr<Changeset> ret(
+      new Changeset(line, 1, orig_pos, cursor_pos));
+  return ret;
 }
 
 // place cursor at beginning of line above.
 // stops at first line.
 // returns number of lines moved up.
-Buffer::Changeset Buffer::cursormv_up(const int &num_lines /* = 1 */)
+std::unique_ptr<Buffer::Changeset>
+  Buffer::cursormv_up(const int &num_lines /* = 1 */)
 {
   Line_list::difference_type moves = 0;
   auto orig_pos = cursor_pos;
@@ -107,14 +112,18 @@ Buffer::Changeset Buffer::cursormv_up(const int &num_lines /* = 1 */)
   }
   cursor = local_first_char();
   cursor_pos.x = 0;
+
   // cursor positions reversed because things change upwards.
-  return Changeset(line, moves, cursor_pos, orig_pos);
+  std::unique_ptr<Changeset> ret(
+      new Changeset(line, moves, cursor_pos, orig_pos));
+  return ret;
 }
 
 // place cursor at beginning of line below.
 // stops at last line.
 // returns number of lines moved down.
-Buffer::Changeset Buffer::cursormv_down(const int &num_lines /* = 1 */)
+std::unique_ptr<Buffer::Changeset>
+  Buffer::cursormv_down(const int &num_lines /* = 1 */)
 {
   Line_list::difference_type moves = 0;
   auto orig_pos = cursor_pos;
@@ -126,13 +135,17 @@ Buffer::Changeset Buffer::cursormv_down(const int &num_lines /* = 1 */)
   }
   cursor = local_first_char();
   cursor_pos.x = 0;
-  return Changeset(line, moves, orig_pos, cursor_pos);
+
+  std::unique_ptr<Changeset> ret(
+      new Changeset(line, moves, orig_pos, cursor_pos));
+  return ret;
 }
 
 // move the cursor left, possibly wrapping to previous line.
 // Stops at first position of first line.
 // returns number of positions moved left.
-Buffer::Changeset Buffer::cursormv_left(const int &num_moves /* = 1 */)
+std::unique_ptr<Buffer::Changeset>
+  Buffer::cursormv_left(const int &num_moves /* = 1 */)
 {
   Line_list::difference_type taken = 0;
   int wraps = 0;
@@ -159,13 +172,17 @@ Buffer::Changeset Buffer::cursormv_left(const int &num_moves /* = 1 */)
     }
   }
   // cursor positions reversed because things change upwards.
-  return Changeset(line, wraps + 1, cursor_pos, orig_pos);
+
+  std::unique_ptr<Changeset> ret(
+      new Changeset(line, wraps + 1, cursor_pos, orig_pos));
+  return ret;
 }
 
 // move the cursor right, possibly wrapping to next line.
 // Stops after last position of last line.
 // returns number of positions moved right.
-Buffer::Changeset Buffer::cursormv_right(const int &num_moves /* = 1 */)
+std::unique_ptr<Buffer::Changeset>
+  Buffer::cursormv_right(const int &num_moves /* = 1 */)
 {
   Line_list::difference_type taken = 0;
   int wraps = 0;
@@ -190,26 +207,32 @@ Buffer::Changeset Buffer::cursormv_right(const int &num_moves /* = 1 */)
       ++wraps;
     }
   }
-  return Changeset(line, wraps + 1, orig_pos, cursor_pos);
+
+  std::unique_ptr<Changeset> ret(
+      new Changeset(line, wraps + 1, orig_pos, cursor_pos));
+  return ret;
 }
 
 // perform necessary actions to handle pressing of BACKSPACE.
 // return numbers of backspace operations performed successfully.
-Buffer::Changeset Buffer::do_backspace(const int &num_presses /* = 1 */)
+std::unique_ptr<Buffer::Changeset>
+  Buffer::do_backspace(const int &num_presses /* = 1 */)
 {
   Line_list::difference_type num_done = 0;
-  Changeset ret(line, 0, cursor_pos, cursor_pos);
+  std::unique_ptr<Changeset> ret(
+    new Changeset(line, 0, cursor_pos, cursor_pos));
   auto first = very_first_char();
   while (cursor != first && num_done < num_presses) {
-    ret.combine(cursormv_left());
-    ret.combine(do_delete());
+    ret->combine(*cursormv_left());
+    ret->combine(*do_delete());
   }
   return ret;
 }
 
 // perform necessary actions to handle pressing of DELETE.
 // returns number of delete operations performed successfully.
-Buffer::Changeset Buffer::do_delete(const int &num_presses /* = 1 */)
+std::unique_ptr<Buffer::Changeset>
+  Buffer::do_delete(const int &num_presses /* = 1 */)
 {
   Line_list::difference_type num_done = 0;
   int wraps = 0;
@@ -227,12 +250,16 @@ Buffer::Changeset Buffer::do_delete(const int &num_presses /* = 1 */)
     }
     ++num_done;
   }
-  return Changeset(line, wraps, orig_pos, cursor_pos);
+
+  std::unique_ptr<Changeset> ret(
+      new Changeset(line, wraps, orig_pos, cursor_pos));
+  return ret;
 }
 
 // perform necessary actions to handle pressing of ENTER.
 // insert a line break before character under cursor.
-Buffer::Changeset Buffer::do_enter(const int &num_presses /* = 1 */)
+std::unique_ptr<Buffer::Changeset>
+  Buffer::do_enter(const int &num_presses /* = 1 */)
 {
   Line_list::difference_type num_done = 0;
   auto orig_pos = cursor_pos;
@@ -248,27 +275,38 @@ Buffer::Changeset Buffer::do_enter(const int &num_presses /* = 1 */)
     ++num_done;
   }
   cursor_pos.x = 0;
-  return Changeset(line, num_done, orig_pos, cursor_pos);
+
+  std::unique_ptr<Changeset> ret(
+      new Changeset(line, num_done, orig_pos, cursor_pos));
+  return ret;
 }
 
 // perform necessary actions to handle pressing of HOME.
 // place cursor on first character of line.
-Buffer::Changeset Buffer::do_home()
+std::unique_ptr<Buffer::Changeset>
+  Buffer::do_home()
 {
   auto orig_pos = cursor_pos;
   cursor = local_first_char();
   cursor_pos.x = 0;
-  return Changeset(line, 0, orig_pos, cursor_pos);
+
+  std::unique_ptr<Changeset> ret(
+      new Changeset(line, 0, orig_pos, cursor_pos));
+  return ret;
 }
 
 // perform necessary actions to handle pressing of END.
 // place cursor after last character of line.
-Buffer::Changeset Buffer::do_end()
+std::unique_ptr<Buffer::Changeset>
+  Buffer::do_end()
 {
   auto orig_pos = cursor_pos;
   cursor = local_end_char();
   cursor_pos.x = line->size() - 1;
-  return Changeset(line, 0, orig_pos, cursor_pos);
+
+  std::unique_ptr<Changeset> ret(
+      new Changeset(line, 0, orig_pos, cursor_pos));
+  return ret;
 }
 
 // include another Changeset's information in this one.
