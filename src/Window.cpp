@@ -27,13 +27,6 @@ void Window::edit_text()
     //TODO: change to a lookup table. Look up each key in table and if
     //something is found then call that, otherwise use default (type it).
     //then can probably make this inline.
-    //
-    //some Buffer functions return ints and some don't. Can't simply make a
-    //map of ints to function pointers because types are different. Idea:
-    //make local functions that handle these keypresses during edit mode,
-    //and make them all take and return void. This way buffer switching
-    //works, using a map works, cleaner mapping, modular to allow extension,
-    //and lets me learn how to use maps. Probably should make them private.
     switch(last_char) {
       case KEY_UP:
         front->cursormv_up();
@@ -71,20 +64,3 @@ void Window::edit_text()
     }
   } while (!done);
 }
-
-// reach into the front Buffer and get their insides.
-std::list<Line> &Window::front_lines()
-{
-  return front->lines;
-}
-
-std::list<Line>::iterator &Window::front_line()
-{
-  return front->line;
-}
-
-Line::iterator &Window::front_cursor()
-{
-  return front->cursor;
-}
-
