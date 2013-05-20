@@ -7,6 +7,7 @@
 
 #include <ncurses.h>
 
+#include "Window_manager.h"
 #include "Buffer.h"
 #include "Line.h"
 
@@ -22,15 +23,18 @@ class Window {
     // constructor:
     // uses given ncurses window.
     // shows the given buffer.
-    Window(WINDOW *active, Buffer *b);
+    Window(Window_manager *manager_, int buff_id, WINDOW *active);
 
     // do edit mode:
     // interpret user input while updating buffer and screen.
     void edit_text();
 
   private:
-    // buffer currently shown
-    Buffer *front;
+    // this window's manager
+    Window_manager *manager;
+
+    // id of buffer currently shown
+    int buffer_id;
 
     // All operations will be performed using the active ncurses window.
     // can be set by a window manager.

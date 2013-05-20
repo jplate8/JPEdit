@@ -17,50 +17,34 @@ Window_manager::Window_manager() : Window_manager("") { }
 Window_manager::Window_manager(const std::string &path)
 {
   open(path);
-  selected = &windows[0];
+  add_window();
 }
 
-// select the Window with the given ID
-bool Window_manager::select(const int &window_id)
+// add and select a window to the list
+// with the given buffer and ncurses window.
+// defaults to first buffer and standard screen.
+void Window_manager::add_window(int buff_id /* = 0 */, 
+                               WINDOW *nc_win /* = stdscr */)
 {
-  if (windows.size() < window_id + 1) {
-    return false;
-  }
-  selected = &windows[window_id];
-  return true;
-}
-
-// add a window to the list
-void Window_manager::add_window(Window &new_window)
-{
-  windows.push_back(new_window);
+  std::unique_ptr<Window> p(new Window(this, buff_id, nc_win));
+  windows.push_back(std::move(p));
+  selected = --end(windows);
 }
 
 // open buffer for given path and bring it to front of selected window.
 int Window_manager::open(const std::string &path)
 {
   //TODO: check that no buffer exists for requested file.
-  Buffer buf(path);
-  buffers.push_back(buf);
+  std::unique_ptr<Buffer> p(new Buffer(path));
+  buffers.push_back(std::move(p));
   return buffers.size() - 1;
 }
 
-// relinquish control of a window to the window of the given ID.
-// if relinquisher is not selected, does nothing.
-// true on success.
-bool Window_manager::relinuish(Window *relinquisher, const int &new_window_id)
+// get the buffer for the given ID.
+Buffer &Window_manager::get_buffer(const int &buffer_id)
 {
-  if (relinquisher != selected ||
-      windows.size() < new_window_id + 1) {
-    return false;
-  }
-  selected = &windows[new_window_id];
-  return true;
+  //TODO: what to do if not a valid id?
+  //When a buffer is deleted, will all Windows be visited to make
+  //sure that they aren't referring to an old one?
+  return *buffers[buffer_id];
 }
-/*
-// set the window's active ncurses window.
-void Window_manager::set_window(Window &window, WINDOW *new_active)
-{
-  window.active_window = new_active;
-}
-*/
