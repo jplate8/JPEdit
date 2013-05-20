@@ -2,6 +2,8 @@
 //
 // Represents a set of windows and tracks user interatcoin with them.
 
+#include <iostream>
+
 #include "Window_manager.h"
 #include "Window.h"
 #include "Buffer.h"
@@ -16,6 +18,9 @@ Window_manager::Window_manager(const std::string &path /* = "" */)
   add_window();
   //TODO: if I want mulit-modality,
   //implement some sort of control that doesn't involve editing mode.
+#ifndef NDEBUG
+  std::cerr << "about to edit text..." << std::endl;
+#endif
   (*selected)->edit_text();
 }
 
