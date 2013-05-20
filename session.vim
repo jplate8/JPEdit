@@ -28,6 +28,7 @@ set shiftwidth=2
 set smarttab
 set suffixes=.bak,~,.swp,.o,.info,.aux,.log,.dvi,.bbl,.blg,.brf,.cb,.ind,.idx,.ilg,.inx,.out,.toc
 set tabstop=2
+set window=39
 let s:so_save = &so | let s:siso_save = &siso | set so=0 siso=0
 let v:this_session=expand("<sfile>:p")
 silent only
@@ -36,15 +37,15 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +24 src/Window_manager.h
-badd +1 src/Window_manager.cpp
-badd +1 src/Window.h
+badd +26 src/Window_manager.h
+badd +19 src/Window_manager.cpp
+badd +39 src/Window.h
 badd +1 src/Window.cpp
 badd +127 src/Buffer.h
-badd +11 src/Buffer.cpp
-badd +48 src/main.cpp
+badd +14 src/Buffer.cpp
+badd +32 src/main.cpp
 args src/Window_manager.h
-edit src/Buffer.cpp
+edit src/main.cpp
 set splitbelow splitright
 wincmd _ | wincmd |
 split
@@ -65,9 +66,9 @@ nnoremap <buffer> 	 :call search('\[[0-9]*:[^\]]*\]'):<BS>
 nnoremap <buffer> j gj
 nnoremap <buffer> k gk
 nnoremap <buffer> p :wincmd p:<BS>
-nnoremap <buffer> <Down> gj
-nnoremap <buffer> <Up> gk
 nnoremap <buffer> <S-Tab> :call search('\[[0-9]*:[^\]]*\]','b'):<BS>
+nnoremap <buffer> <Up> gk
+nnoremap <buffer> <Down> gj
 let &cpo=s:cpo_save
 unlet s:cpo_save
 setlocal keymap=
@@ -276,56 +277,26 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-18
+16
 normal zo
-18
-normal zc
-40
+28
 normal zo
-40
-normal zc
-65
-normal zc
-71
-normal zc
-81
+60
 normal zo
-81
-normal zc
-96
+78
 normal zo
-96
-normal zc
-111
+28
 normal zo
-111
-normal zc
-137
+60
 normal zo
-137
-normal zc
-161
+78
 normal zo
-161
-normal zc
-174
-normal zo
-174
-normal zc
-195
-normal zo
-195
-normal zc
-213
-normal zc
-221
-normal zc
-let s:l = 15 - ((0 * winheight(0) + 18) / 36)
+let s:l = 36 - ((31 * winheight(0) + 18) / 36)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-15
-normal! 0
+36
+normal! 04l
 wincmd w
 2wincmd w
 exe '1resize ' . ((&lines * 1 + 20) / 40)
