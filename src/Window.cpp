@@ -8,8 +8,6 @@
 #include "Window.h"
 #include "Buffer.h"
 
-#define KEY_ESC 27
-
 // constructor:
 // uses given ncurses window.
 // shows the given buffer.
@@ -77,4 +75,20 @@ std::unique_ptr<Buffer::Changeset> Window::do_keystroke(const int &key)
         return front->insert(key);
         break;
     }
+}
+
+// update active ncurses window to reflect Buffer changes.
+void Window::update(std::unique_ptr<Buffer::Changeset> change)
+{
+  //TODO: add an options lookup table.
+  //If a certain option is set, type each character in a random color.
+  int y = change->cursor_orig.y;
+  for (std::string line : change->changed) {
+    move(y, 0);
+    clrtoeol();
+    wprintw(active_window, line.c_str());
+    ++y;
+  }
+  move(change->cursor_final.y, change->cursor_final.x);
+  wrefresh(active_window);
 }

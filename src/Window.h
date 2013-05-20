@@ -10,6 +10,8 @@
 #include "Buffer.h"
 #include "Line.h"
 
+#define KEY_ESC 27
+
 class Window_manager;
 
 class Window {
@@ -30,13 +32,16 @@ class Window {
     // buffer currently shown
     Buffer *front;
 
+    // All operations will be performed using the active ncurses window.
+    // can be set by a window manager.
+    WINDOW* active_window;
+
     // choose and execute appropriate buffer-editing function.
     // returns nullptr on ESC.
     std::unique_ptr<Buffer::Changeset> do_keystroke(const int &key);
 
-    // All operations will be performed using the active ncursrs window.
-    // can be set by a window manager.
-    WINDOW* active_window;
+    // update active ncurses window to reflect Buffer changes.
+    void update(std::unique_ptr<Buffer::Changeset> change);
 };
 
 #endif /* WINDOW_H */
