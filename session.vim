@@ -28,7 +28,6 @@ set shiftwidth=2
 set smarttab
 set suffixes=.bak,~,.swp,.o,.info,.aux,.log,.dvi,.bbl,.blg,.brf,.cb,.ind,.idx,.ilg,.inx,.out,.toc
 set tabstop=2
-set window=39
 let s:so_save = &so | let s:siso_save = &siso | set so=0 siso=0
 let v:this_session=expand("<sfile>:p")
 silent only
@@ -37,15 +36,16 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +26 src/Window_manager.h
+badd +1 src/Window_manager.h
 badd +19 src/Window_manager.cpp
 badd +39 src/Window.h
 badd +1 src/Window.cpp
 badd +127 src/Buffer.h
 badd +14 src/Buffer.cpp
-badd +32 src/main.cpp
+badd +36 src/main.cpp
+badd +15 src/Debug.h
 args src/Window_manager.h
-edit src/main.cpp
+edit src/Window_manager.cpp
 set splitbelow splitright
 wincmd _ | wincmd |
 split
@@ -55,8 +55,8 @@ set nosplitbelow
 set nosplitright
 wincmd t
 set winheight=1 winwidth=1
-exe '1resize ' . ((&lines * 1 + 20) / 40)
-exe '2resize ' . ((&lines * 36 + 20) / 40)
+exe '1resize ' . ((&lines * 2 + 19) / 39)
+exe '2resize ' . ((&lines * 34 + 19) / 39)
 argglobal
 enew
 file -MiniBufExplorer-
@@ -66,9 +66,9 @@ nnoremap <buffer> 	 :call search('\[[0-9]*:[^\]]*\]'):<BS>
 nnoremap <buffer> j gj
 nnoremap <buffer> k gk
 nnoremap <buffer> p :wincmd p:<BS>
-nnoremap <buffer> <S-Tab> :call search('\[[0-9]*:[^\]]*\]','b'):<BS>
-nnoremap <buffer> <Up> gk
 nnoremap <buffer> <Down> gj
+nnoremap <buffer> <Up> gk
+nnoremap <buffer> <S-Tab> :call search('\[[0-9]*:[^\]]*\]','b'):<BS>
 let &cpo=s:cpo_save
 unlet s:cpo_save
 setlocal keymap=
@@ -277,30 +277,18 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-16
+20
 normal zo
-28
-normal zo
-60
-normal zo
-78
-normal zo
-28
-normal zo
-60
-normal zo
-78
-normal zo
-let s:l = 36 - ((31 * winheight(0) + 18) / 36)
+let s:l = 34 - ((33 * winheight(0) + 17) / 34)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-36
-normal! 04l
+34
+normal! 0
 wincmd w
 2wincmd w
-exe '1resize ' . ((&lines * 1 + 20) / 40)
-exe '2resize ' . ((&lines * 36 + 20) / 40)
+exe '1resize ' . ((&lines * 2 + 19) / 39)
+exe '2resize ' . ((&lines * 34 + 19) / 39)
 tabnext 1
 if exists('s:wipebuf')
   silent exe 'bwipe ' . s:wipebuf

@@ -8,6 +8,10 @@
 #include "Window.h"
 #include "Buffer.h"
 
+#ifndef NDEBUG
+#include "Debug.h"
+#endif /* NDEBUG */
+
 // constructor:
 // creates a new window with a Buffer for the given file path,
 // and sets it as currently selected.
@@ -19,8 +23,8 @@ Window_manager::Window_manager(const std::string &path /* = "" */)
   //TODO: if I want mulit-modality,
   //implement some sort of control that doesn't involve editing mode.
 #ifndef NDEBUG
-  std::cerr << "about to edit text..." << std::endl;
-#endif
+  Debug::log("about to edit text...");
+#endif /* NDEBUG */
   (*selected)->edit_text();
 }
 
