@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 #include <vector>
 #include <ncurses.h>
 #include <cstring>
@@ -7,9 +8,36 @@
 #include "Window.h"
 #include "Buffer.h"
 
-using namespace std;
+void testFileIO(int argc, char *argv[]);
+void start_editor(const std::string &path);
+void old_start_editor();
 
 int main(int argc, char *argv[])
+{
+  std::string first;
+  if (argc > 1) {
+    first = argv[1];
+  }
+
+  start_editor(first);
+
+  return 0;
+}
+
+void testFileIO(int argc, char *argv[])
+{
+  if (argc > 1) {
+    Buffer buff(argv[1]);
+    // write unedited buffer
+    buff.write();
+  } else {
+    Buffer buff;
+    buff.write();
+    std::cout << "pass a file as a parameter" << std::endl;
+  }
+}
+
+void start_editor(const std::string &path)
 {
   // ncurses pre-configuration:
   // turn off echoing
@@ -18,28 +46,23 @@ int main(int argc, char *argv[])
   cbreak();
   // set timeout for ESC
   timeout(25);
+  // allocate needed screen memory. usually clears screen.
+  initscr();
 
-  Window_manager wm;
+  //TODO: figure out some control loop
+  Window_manager wm(path);
 
-  if (argc > 1) {
-    Buffer buff(argv[1]);
-    // write unedited buffer
-    buff.write();
-  } else {
-    Buffer buff;
-    buff.write();
-    cout << "pass a file as a parameter" << std::endl;
-  }
-
-  return 0;
+  // deallocate screen stuff. get back normal terminal mode.
+  endwin();
 }
 
-void startEditor() {
+void old_start_editor()
+{
   char mesg[] = "welcome to JPEdit. It sucks.";
   char input[80];
   int row, col;
 
-  // allocate needed memory screen. usually clears screen.
+  // allocate needed screen memory. usually clears screen.
   initscr();
   getmaxyx(stdscr, row, col);
 

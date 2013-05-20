@@ -20,15 +20,11 @@ class Window_manager {
   public:
     using window_list = std::list<std::unique_ptr<Window>>;
 
-    // default constructor:
-    // creates a new Window with empty Buffer,
-    // and sets it as currently selected.
-    Window_manager();
-
     // constructor:
     // creates a new window with a Buffer for the given file path,
     // and sets it as currently selected.
-    explicit Window_manager(const std::string &path);
+    // TODO: figure out variadics and open an arbitrary number of buffers.
+    explicit Window_manager(const std::string &path = "");
 
     // currently selected window.
     // TODO: perhaps hide this and exit if no more windows.
