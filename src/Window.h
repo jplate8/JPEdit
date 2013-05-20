@@ -42,7 +42,8 @@ class Window {
 
     // choose and execute appropriate buffer-editing function.
     // returns nullptr on ESC.
-    std::unique_ptr<Buffer::Changeset> do_keystroke(const int &key);
+    std::unique_ptr<Buffer::Changeset>
+    do_keystroke(const int &key, Buffer &front);
 
     // update active ncurses window to reflect Buffer changes.
     void update(std::unique_ptr<Buffer::Changeset> change);

@@ -23,12 +23,13 @@ void Window::edit_text()
 {
   int last_key;
   bool done = false;
+  Buffer &front = manager->get_buffer(buffer_id);
   std::unique_ptr<Buffer::Changeset> last_change(nullptr);
 
   // edit until user exits session
   do {
     last_key = wgetch(active_window);
-    last_change = do_keystroke(last_key);
+    last_change = do_keystroke(last_key, front);
     if (last_change != nullptr) {
       // update active_window according to last_change
     } else {
@@ -39,9 +40,9 @@ void Window::edit_text()
 
 // choose and execute appropriate buffer-editing function.
 // returns nullptr on ESC.
-std::unique_ptr<Buffer::Changeset> Window::do_keystroke(const int &key)
+std::unique_ptr<Buffer::Changeset>
+Window::do_keystroke(const int &key, Buffer &front)
 {
-  Buffer &front = manager->get_buffer(buffer_id);
   //TODO: change to a lookup table. Look up each key in table and if
   //something is found then call that, otherwise use default (type it).
   //then can probably make this inline.

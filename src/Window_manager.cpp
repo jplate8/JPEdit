@@ -24,7 +24,7 @@ Window_manager::Window_manager(const std::string &path)
 // with the given buffer and ncurses window.
 // defaults to first buffer and standard screen.
 void Window_manager::add_window(int buff_id /* = 0 */, 
-                               WINDOW *nc_win /* = stdscr */)
+                                WINDOW *nc_win /* = stdscr */)
 {
   std::unique_ptr<Window> p(new Window(this, buff_id, nc_win));
   windows.push_back(std::move(p));

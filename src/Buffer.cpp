@@ -10,7 +10,10 @@
 
 // default constructor:
 // does not bind to a file.
-Buffer::Buffer() : Buffer("") { }
+Buffer::Buffer() : Buffer("")
+{
+  // empty
+}
 
 // constructor:
 // binds to the given file.
@@ -84,7 +87,7 @@ void Buffer::set_path(const std::string &p)
 
 // insert the given character before the cursor.
 std::unique_ptr<Buffer::Changeset>
-  Buffer::insert(const int &character)
+Buffer::insert(const int &character)
 {
   //TODO: update this when line length limiting is implemented.
   line->insert(cursor, character);
@@ -100,7 +103,7 @@ std::unique_ptr<Buffer::Changeset>
 // stops at first line.
 // returns number of lines moved up.
 std::unique_ptr<Buffer::Changeset>
-  Buffer::cursormv_up(const int &num_lines /* = 1 */)
+Buffer::cursormv_up(const int &num_lines /* = 1 */)
 {
   Line_list::difference_type moves = 0;
   auto orig_pos = cursor_pos;
@@ -123,7 +126,7 @@ std::unique_ptr<Buffer::Changeset>
 // stops at last line.
 // returns number of lines moved down.
 std::unique_ptr<Buffer::Changeset>
-  Buffer::cursormv_down(const int &num_lines /* = 1 */)
+Buffer::cursormv_down(const int &num_lines /* = 1 */)
 {
   Line_list::difference_type moves = 0;
   auto orig_pos = cursor_pos;
@@ -145,7 +148,7 @@ std::unique_ptr<Buffer::Changeset>
 // Stops at first position of first line.
 // returns number of positions moved left.
 std::unique_ptr<Buffer::Changeset>
-  Buffer::cursormv_left(const int &num_moves /* = 1 */)
+Buffer::cursormv_left(const int &num_moves /* = 1 */)
 {
   Line_list::difference_type taken = 0;
   int wraps = 0;
@@ -182,7 +185,7 @@ std::unique_ptr<Buffer::Changeset>
 // Stops after last position of last line.
 // returns number of positions moved right.
 std::unique_ptr<Buffer::Changeset>
-  Buffer::cursormv_right(const int &num_moves /* = 1 */)
+Buffer::cursormv_right(const int &num_moves /* = 1 */)
 {
   Line_list::difference_type taken = 0;
   int wraps = 0;
@@ -216,7 +219,7 @@ std::unique_ptr<Buffer::Changeset>
 // perform necessary actions to handle pressing of BACKSPACE.
 // return numbers of backspace operations performed successfully.
 std::unique_ptr<Buffer::Changeset>
-  Buffer::do_backspace(const int &num_presses /* = 1 */)
+Buffer::do_backspace(const int &num_presses /* = 1 */)
 {
   Line_list::difference_type num_done = 0;
   std::unique_ptr<Changeset> ret(
@@ -232,7 +235,7 @@ std::unique_ptr<Buffer::Changeset>
 // perform necessary actions to handle pressing of DELETE.
 // returns number of delete operations performed successfully.
 std::unique_ptr<Buffer::Changeset>
-  Buffer::do_delete(const int &num_presses /* = 1 */)
+Buffer::do_delete(const int &num_presses /* = 1 */)
 {
   Line_list::difference_type num_done = 0;
   int wraps = 0;
@@ -259,7 +262,7 @@ std::unique_ptr<Buffer::Changeset>
 // perform necessary actions to handle pressing of ENTER.
 // insert a line break before character under cursor.
 std::unique_ptr<Buffer::Changeset>
-  Buffer::do_enter(const int &num_presses /* = 1 */)
+Buffer::do_enter(const int &num_presses /* = 1 */)
 {
   Line_list::difference_type num_done = 0;
   auto orig_pos = cursor_pos;
@@ -283,8 +286,7 @@ std::unique_ptr<Buffer::Changeset>
 
 // perform necessary actions to handle pressing of HOME.
 // place cursor on first character of line.
-std::unique_ptr<Buffer::Changeset>
-  Buffer::do_home()
+std::unique_ptr<Buffer::Changeset> Buffer::do_home()
 {
   auto orig_pos = cursor_pos;
   cursor = local_first_char();
@@ -297,8 +299,7 @@ std::unique_ptr<Buffer::Changeset>
 
 // perform necessary actions to handle pressing of END.
 // place cursor after last character of line.
-std::unique_ptr<Buffer::Changeset>
-  Buffer::do_end()
+std::unique_ptr<Buffer::Changeset> Buffer::do_end()
 {
   auto orig_pos = cursor_pos;
   cursor = local_end_char();
