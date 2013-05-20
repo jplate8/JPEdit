@@ -54,8 +54,7 @@ Buffer::Changeset::Changeset(Line_list::iterator topln,
 
 bool Buffer::write()
 {
-  std::ofstream file;
-  file.open(path);
+  std::ofstream file(path);
   if (!file) {
     file.close();
     std::cout << "write failed" << std::endl;
@@ -65,8 +64,9 @@ bool Buffer::write()
   int size = lines.size();
   int lineindex = 0;
   for (Line line : lines) {
-    std::string file_line(line.begin(), line.end());
-    file << file_line;
+    for (char letter : line) {
+      file << letter;
+    }
     if (lineindex != size - 1) {
       file << "\n";
     }
