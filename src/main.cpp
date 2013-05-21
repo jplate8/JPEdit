@@ -40,14 +40,17 @@ void testFileIO(int argc, char *argv[])
 void start_editor(const std::string &path)
 {
   // ncurses pre-configuration:
+  // allocate needed screen memory. usually clears screen.
+  initscr();
   // turn off echoing
   noecho();
   // make keypresses immediately. let interrupt sequences still work.
   cbreak();
   // set timeout for ESC
-  timeout(25);
-  // allocate needed screen memory. usually clears screen.
-  initscr();
+  timeout(100);
+  // allow arrow keys, function keys, etc.
+  // TODO: when using multiple screens, do this for all of them.
+  keypad(stdscr, true);
 
   //TODO: figure out some control loop
   Window_manager wm(path);

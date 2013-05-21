@@ -22,7 +22,6 @@ class Buffer {
   //  decided: use a lookup table.
   //  See Line.h for ideas on how to use it.
   public:
-    using Line = std::list<char>;
     using Line_list = std::list<Line>;
   
     // default constructor:
@@ -49,22 +48,22 @@ class Buffer {
     // place cursor at beginning of line above.
     // stops at first line.
     // returns number of lines moved up.
-    std::unique_ptr<Changeset> cursormv_up(const int &num_lines = 1);
+    std::unique_ptr<Changeset> do_up(const int &num_lines = 1);
 
     // place cursor at beginning of line below.
     // stops at last line.
     // returns number of lines moved down.
-    std::unique_ptr<Changeset> cursormv_down(const int &num_lines = 1);
+    std::unique_ptr<Changeset> do_down(const int &num_lines = 1);
 
     // move the cursor left, possibly wrapping to previous line.
     // Stops at first position of first line.
     // returns number of positions moved left.
-    std::unique_ptr<Changeset> cursormv_left(const int &num_moves = 1);
+    std::unique_ptr<Changeset> do_left(const int &num_moves = 1);
 
     // move the cursor right, possibly wrapping to next line.
     // Stops after last position of last line.
     // returns number of positions moved right.
-    std::unique_ptr<Changeset> cursormv_right(const int &num_moves = 1);
+    std::unique_ptr<Changeset> do_right(const int &num_moves = 1);
 
     // perform necessary actions to handle pressing of BACKSPACE.
     // return numbers of backspace operations performed successfully.

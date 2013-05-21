@@ -28,6 +28,7 @@ set shiftwidth=2
 set smarttab
 set suffixes=.bak,~,.swp,.o,.info,.aux,.log,.dvi,.bbl,.blg,.brf,.cb,.ind,.idx,.ilg,.inx,.out,.toc
 set tabstop=2
+set window=37
 let s:so_save = &so | let s:siso_save = &siso | set so=0 siso=0
 let v:this_session=expand("<sfile>:p")
 silent only
@@ -37,16 +38,17 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
 endif
 set shortmess=aoO
 badd +1 src/Window_manager.h
-badd +25 src/Window_manager.cpp
-badd +39 src/Window.h
-badd +19 src/Window.cpp
-badd +127 src/Buffer.h
-badd +14 src/Buffer.cpp
-badd +36 src/main.cpp
-badd +22 src/Debug.h
+badd +63 src/Window_manager.cpp
+badd +47 src/Window.h
+badd +42 src/Window.cpp
+badd +25 src/Buffer.h
+badd +79 src/Buffer.cpp
+badd +50 src/main.cpp
+badd +23 src/Debug.h
 badd +7 src/Debug.cpp
+badd +71 jpedit.log
 args src/Window_manager.h
-edit src/Window.cpp
+edit src/Buffer.cpp
 set splitbelow splitright
 wincmd _ | wincmd |
 split
@@ -56,8 +58,8 @@ set nosplitbelow
 set nosplitright
 wincmd t
 set winheight=1 winwidth=1
-exe '1resize ' . ((&lines * 2 + 19) / 39)
-exe '2resize ' . ((&lines * 34 + 19) / 39)
+exe '1resize ' . ((&lines * 2 + 19) / 38)
+exe '2resize ' . ((&lines * 33 + 19) / 38)
 argglobal
 enew
 file -MiniBufExplorer-
@@ -67,9 +69,9 @@ nnoremap <buffer> 	 :call search('\[[0-9]*:[^\]]*\]'):<BS>
 nnoremap <buffer> j gj
 nnoremap <buffer> k gk
 nnoremap <buffer> p :wincmd p:<BS>
-nnoremap <buffer> <S-Tab> :call search('\[[0-9]*:[^\]]*\]','b'):<BS>
-nnoremap <buffer> <Up> gk
 nnoremap <buffer> <Down> gj
+nnoremap <buffer> <Up> gk
+nnoremap <buffer> <S-Tab> :call search('\[[0-9]*:[^\]]*\]','b'):<BS>
 let &cpo=s:cpo_save
 unlet s:cpo_save
 setlocal keymap=
@@ -278,24 +280,82 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-28
+18
+normal zc
+25
 normal zo
-39
+25
+normal zc
+69
 normal zo
-64
+69
+normal zc
+94
 normal zo
-113
+104
 normal zo
-let s:l = 36 - ((18 * winheight(0) + 17) / 34)
+94
+normal zc
+119
+normal zc
+137
+normal zc
+165
+normal zo
+165
+normal zc
+196
+normal zo
+196
+normal zc
+226
+normal zo
+238
+normal zo
+226
+normal zc
+271
+normal zo
+283
+normal zo
+271
+normal zc
+313
+normal zo
+313
+normal zc
+337
+normal zo
+346
+normal zo
+337
+normal zc
+372
+normal zo
+372
+normal zc
+404
+normal zc
+425
+normal zc
+445
+normal zo
+451
+normal zo
+460
+normal zo
+445
+normal zc
+let s:l = 26 - ((8 * winheight(0) + 16) / 33)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-36
-normal! 018l
+26
+normal! 03l
 wincmd w
 2wincmd w
-exe '1resize ' . ((&lines * 2 + 19) / 39)
-exe '2resize ' . ((&lines * 34 + 19) / 39)
+exe '1resize ' . ((&lines * 2 + 19) / 38)
+exe '2resize ' . ((&lines * 33 + 19) / 38)
 tabnext 1
 if exists('s:wipebuf')
   silent exe 'bwipe ' . s:wipebuf

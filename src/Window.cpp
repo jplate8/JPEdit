@@ -31,7 +31,8 @@ void Window::edit_text()
   Buffer &front = manager->get_buffer(buffer_id);
   std::unique_ptr<Buffer::Changeset> last_change(nullptr);
 #ifndef NDEBUG
-  Debug::log("entering editing loop...");
+  Debug::indent();
+  Debug::log("entering editing loop");
   Debug::indent();
 #endif /* NDEBUG */
 
@@ -41,11 +42,13 @@ void Window::edit_text()
     Debug::log("starting an editing iteration");
 #endif /* NDEBUG */
     last_key = wgetch(active_window);
-    last_change = do_keystroke(last_key, front);
-    if (last_change != nullptr) {
-      // update active_window according to last_change
-    } else {
-      done = true;
+    if (last_key != ERR) {
+      last_change = do_keystroke(last_key, front);
+      if (last_change != nullptr) {
+        update(std::move(last_change));
+      } else {
+        done = true;
+      }
     }
 #ifndef NDEBUG
     Debug::log("ending an editing iteration");
@@ -53,7 +56,8 @@ void Window::edit_text()
   } while (!done);
 #ifndef NDEBUG
   Debug::outdent();
-  Debug::log("...exiting editing loop");
+  Debug::log("exiting editing loop");
+  Debug::outdent();
 #endif /* NDEBUG */
 }
 
@@ -63,9 +67,9 @@ std::unique_ptr<Buffer::Changeset>
 Window::do_keystroke(const int &key, Buffer &front)
 {
 #ifndef NDEBUG
+  Debug::indent();
   std::stringstream ss;
-  ss << "performing keystroke for " << key;
-  ss << ", which in char form is: " << static_cast<char>(key);
+  ss << "performing keystroke for " << static_cast<char>(key);
   Debug::log(ss.str());
 #endif /* NDEBUG */
   //TODO: change to a lookup table. Look up each key in table and if
@@ -73,39 +77,90 @@ Window::do_keystroke(const int &key, Buffer &front)
   //then can probably make this inline.
   switch(key) {
     case KEY_UP:
-      return front.cursormv_up();
+#ifndef NDEBUG
+  Debug::log("about to perform do_up");
+  Debug::outdent();
+#endif /* NDEBUG */
+      return front.do_up();
       break;
     case KEY_DOWN:
-      return front.cursormv_down();
+#ifndef NDEBUG
+  Debug::log("about to perform do_down");
+  Debug::outdent();
+#endif /* NDEBUG */
+      return front.do_down();
       break;
     case KEY_LEFT:
-      return front.cursormv_left();
+#ifndef NDEBUG
+  Debug::log("about to perform do_left");
+  Debug::outdent();
+#endif /* NDEBUG */
+      return front.do_left();
       break;
     case KEY_RIGHT:
-      return front.cursormv_right();
+#ifndef NDEBUG
+  Debug::log("about to perform do_right");
+  Debug::outdent();
+#endif /* NDEBUG */
+      return front.do_right();
       break;
     case KEY_BACKSPACE:
+#ifndef NDEBUG
+  Debug::log("about to perform do_backspace");
+  Debug::outdent();
+#endif /* NDEBUG */
       return front.do_backspace();
       break;
     case KEY_DC:
+#ifndef NDEBUG
+  Debug::log("about to perform do_delete");
+  Debug::outdent();
+#endif /* NDEBUG */
       return front.do_delete();
       break;
     case KEY_ENTER:
+#ifndef NDEBUG
+  Debug::log("about to perform do_enter");
+  Debug::outdent();
+#endif /* NDEBUG */
       return front.do_enter();
       break;
     case KEY_HOME:
+#ifndef NDEBUG
+  Debug::log("about to perform do_home");
+  Debug::outdent();
+#endif /* NDEBUG */
       return front.do_home();
       break;
     case KEY_END:
+#ifndef NDEBUG
+  Debug::log("about to perform do_end");
+  Debug::outdent();
+#endif /* NDEBUG */
       return front.do_end();
       break;
     case KEY_ESC:
+#ifndef NDEBUG
+  Debug::log("received ESC: about to return nullptr");
+  Debug::outdent();
+#endif /* NDEBUG */
       return nullptr;
       break;
     default:
+#ifndef NDEBUG
+  std::stringstream ss;
+  ss << "about to insert " << static_cast<char>(key);
+  Debug::log(ss.str());
+#endif /* NDEBUG */
       return front.insert(key);
       break;
   }
+#ifndef NDEBUG
+  std::string s("finished ");
+  s.append(ss.str());
+  Debug::log(s);
+  Debug::outdent();
+#endif /* NDEBUG */
 }
 
 // update active ncurses window to reflect Buffer changes.

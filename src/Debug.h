@@ -19,7 +19,8 @@ class Debug {
       if (indent_level > 0) {
         std::stringstream tabs;
         for (int i = 0; i < indent_level; ++i) {
-          tabs << '\t';
+          // 4 spaces
+          tabs << "    ";
         }
         std::cerr << tabs.str();
       }

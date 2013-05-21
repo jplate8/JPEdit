@@ -51,8 +51,16 @@ int Window_manager::open(const std::string &path)
 // get the buffer for the given ID.
 Buffer &Window_manager::get_buffer(const int &buffer_id)
 {
+#ifndef NDEBUG
+  Debug::indent();
+  Debug::log("starting to get buffer");
+#endif /* NDEBUG */
   //TODO: what to do if not a valid id?
   //When a buffer is deleted, will all Windows be visited to make
   //sure that they aren't referring to an old one?
+#ifndef NDEBUG
+  Debug::log("finished getting buffer");
+  Debug::outdent();
+#endif /* NDEBUG */
   return *buffers[buffer_id];
 }
