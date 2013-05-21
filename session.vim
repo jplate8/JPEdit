@@ -37,15 +37,16 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
 endif
 set shortmess=aoO
 badd +1 src/Window_manager.h
-badd +19 src/Window_manager.cpp
+badd +25 src/Window_manager.cpp
 badd +39 src/Window.h
-badd +1 src/Window.cpp
+badd +19 src/Window.cpp
 badd +127 src/Buffer.h
 badd +14 src/Buffer.cpp
 badd +36 src/main.cpp
-badd +15 src/Debug.h
+badd +22 src/Debug.h
+badd +7 src/Debug.cpp
 args src/Window_manager.h
-edit src/Window_manager.cpp
+edit src/Window.cpp
 set splitbelow splitright
 wincmd _ | wincmd |
 split
@@ -66,9 +67,9 @@ nnoremap <buffer> 	 :call search('\[[0-9]*:[^\]]*\]'):<BS>
 nnoremap <buffer> j gj
 nnoremap <buffer> k gk
 nnoremap <buffer> p :wincmd p:<BS>
-nnoremap <buffer> <Down> gj
-nnoremap <buffer> <Up> gk
 nnoremap <buffer> <S-Tab> :call search('\[[0-9]*:[^\]]*\]','b'):<BS>
+nnoremap <buffer> <Up> gk
+nnoremap <buffer> <Down> gj
 let &cpo=s:cpo_save
 unlet s:cpo_save
 setlocal keymap=
@@ -277,14 +278,20 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-20
+28
 normal zo
-let s:l = 34 - ((33 * winheight(0) + 17) / 34)
+39
+normal zo
+64
+normal zo
+113
+normal zo
+let s:l = 36 - ((18 * winheight(0) + 17) / 34)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-34
-normal! 0
+36
+normal! 018l
 wincmd w
 2wincmd w
 exe '1resize ' . ((&lines * 2 + 19) / 39)

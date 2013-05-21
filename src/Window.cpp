@@ -8,6 +8,11 @@
 #include "Window.h"
 #include "Buffer.h"
 
+#ifndef NDEBUG
+#include <sstream>
+#include "Debug.h"
+#endif /* NDEBUG */
+
 // constructor:
 // uses given ncurses window.
 // shows the given buffer.
@@ -25,9 +30,16 @@ void Window::edit_text()
   bool done = false;
   Buffer &front = manager->get_buffer(buffer_id);
   std::unique_ptr<Buffer::Changeset> last_change(nullptr);
+#ifndef NDEBUG
+  Debug::log("entering editing loop...");
+  Debug::indent();
+#endif /* NDEBUG */
 
   // edit until user exits session
   do {
+#ifndef NDEBUG
+    Debug::log("starting an editing iteration");
+#endif /* NDEBUG */
     last_key = wgetch(active_window);
     last_change = do_keystroke(last_key, front);
     if (last_change != nullptr) {
@@ -35,7 +47,14 @@ void Window::edit_text()
     } else {
       done = true;
     }
+#ifndef NDEBUG
+    Debug::log("ending an editing iteration");
+#endif /* NDEBUG */
   } while (!done);
+#ifndef NDEBUG
+  Debug::outdent();
+  Debug::log("...exiting editing loop");
+#endif /* NDEBUG */
 }
 
 // choose and execute appropriate buffer-editing function.
@@ -43,6 +62,12 @@ void Window::edit_text()
 std::unique_ptr<Buffer::Changeset>
 Window::do_keystroke(const int &key, Buffer &front)
 {
+#ifndef NDEBUG
+  std::stringstream ss;
+  ss << "performing keystroke for " << key;
+  ss << ", which in char form is: " << static_cast<char>(key);
+  Debug::log(ss.str());
+#endif /* NDEBUG */
   //TODO: change to a lookup table. Look up each key in table and if
   //something is found then call that, otherwise use default (type it).
   //then can probably make this inline.
