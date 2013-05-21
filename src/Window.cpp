@@ -71,96 +71,46 @@ Window::do_keystroke(const int &key, Buffer &front)
   std::stringstream ss;
   ss << "performing keystroke for " << static_cast<char>(key);
   Debug::log(ss.str());
+  Debug::outdent();
 #endif /* NDEBUG */
   //TODO: change to a lookup table. Look up each key in table and if
   //something is found then call that, otherwise use default (type it).
   //then can probably make this inline.
   switch(key) {
     case KEY_UP:
-#ifndef NDEBUG
-  Debug::log("about to perform do_up");
-  Debug::outdent();
-#endif /* NDEBUG */
       return front.do_up();
       break;
     case KEY_DOWN:
-#ifndef NDEBUG
-  Debug::log("about to perform do_down");
-  Debug::outdent();
-#endif /* NDEBUG */
       return front.do_down();
       break;
     case KEY_LEFT:
-#ifndef NDEBUG
-  Debug::log("about to perform do_left");
-  Debug::outdent();
-#endif /* NDEBUG */
       return front.do_left();
       break;
     case KEY_RIGHT:
-#ifndef NDEBUG
-  Debug::log("about to perform do_right");
-  Debug::outdent();
-#endif /* NDEBUG */
       return front.do_right();
       break;
     case KEY_BACKSPACE:
-#ifndef NDEBUG
-  Debug::log("about to perform do_backspace");
-  Debug::outdent();
-#endif /* NDEBUG */
       return front.do_backspace();
       break;
     case KEY_DC:
-#ifndef NDEBUG
-  Debug::log("about to perform do_delete");
-  Debug::outdent();
-#endif /* NDEBUG */
       return front.do_delete();
       break;
     case KEY_ENTER:
-#ifndef NDEBUG
-  Debug::log("about to perform do_enter");
-  Debug::outdent();
-#endif /* NDEBUG */
       return front.do_enter();
       break;
     case KEY_HOME:
-#ifndef NDEBUG
-  Debug::log("about to perform do_home");
-  Debug::outdent();
-#endif /* NDEBUG */
       return front.do_home();
       break;
     case KEY_END:
-#ifndef NDEBUG
-  Debug::log("about to perform do_end");
-  Debug::outdent();
-#endif /* NDEBUG */
       return front.do_end();
       break;
     case KEY_ESC:
-#ifndef NDEBUG
-  Debug::log("received ESC: about to return nullptr");
-  Debug::outdent();
-#endif /* NDEBUG */
       return nullptr;
       break;
     default:
-#ifndef NDEBUG
-  std::stringstream ss;
-  ss << "about to insert " << static_cast<char>(key);
-  Debug::log(ss.str());
-#endif /* NDEBUG */
       return front.insert(key);
       break;
   }
-#ifndef NDEBUG
-  std::string s("finished ");
-  s.append(ss.str());
-  Debug::log(s);
-  Debug::outdent();
-#endif /* NDEBUG */
 }
 
 // update active ncurses window to reflect Buffer changes.

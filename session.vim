@@ -42,13 +42,14 @@ badd +63 src/Window_manager.cpp
 badd +47 src/Window.h
 badd +42 src/Window.cpp
 badd +25 src/Buffer.h
-badd +79 src/Buffer.cpp
+badd +26 src/Buffer.cpp
 badd +50 src/main.cpp
 badd +23 src/Debug.h
 badd +7 src/Debug.cpp
 badd +71 jpedit.log
+badd +0 bugs.txt
 args src/Window_manager.h
-edit src/Buffer.cpp
+edit bugs.txt
 set splitbelow splitright
 wincmd _ | wincmd |
 split
@@ -58,8 +59,8 @@ set nosplitbelow
 set nosplitright
 wincmd t
 set winheight=1 winwidth=1
-exe '1resize ' . ((&lines * 2 + 19) / 38)
-exe '2resize ' . ((&lines * 33 + 19) / 38)
+exe '1resize ' . ((&lines * 3 + 19) / 39)
+exe '2resize ' . ((&lines * 33 + 19) / 39)
 argglobal
 enew
 file -MiniBufExplorer-
@@ -69,9 +70,9 @@ nnoremap <buffer> 	 :call search('\[[0-9]*:[^\]]*\]'):<BS>
 nnoremap <buffer> j gj
 nnoremap <buffer> k gk
 nnoremap <buffer> p :wincmd p:<BS>
-nnoremap <buffer> <Down> gj
-nnoremap <buffer> <Up> gk
 nnoremap <buffer> <S-Tab> :call search('\[[0-9]*:[^\]]*\]','b'):<BS>
+nnoremap <buffer> <Up> gk
+nnoremap <buffer> <Down> gj
 let &cpo=s:cpo_save
 unlet s:cpo_save
 setlocal keymap=
@@ -186,12 +187,12 @@ setlocal nobinary
 setlocal bufhidden=
 setlocal buflisted
 setlocal buftype=
-setlocal cindent
+setlocal nocindent
 setlocal cinkeys=0{,0},0),:,0#,!^F,o,O,e
 setlocal cinoptions=
 setlocal cinwords=if,else,while,do,for,switch
 setlocal colorcolumn=
-setlocal comments=sO:*\ -,mO:*\ \ ,exO:*/,s1:/*,mb:*,ex:*/,://
+setlocal comments=s1:/*,mb:*,ex:*/,://,b:#,:%,:XCOMM,n:>,fb:-
 setlocal commentstring=/*%s*/
 setlocal complete=.,w,b,u,t,i
 setlocal concealcursor=
@@ -208,8 +209,8 @@ setlocal nodiff
 setlocal equalprg=
 setlocal errorformat=
 setlocal expandtab
-if &filetype != 'cpp'
-setlocal filetype=cpp
+if &filetype != 'text'
+setlocal filetype=text
 endif
 setlocal foldcolumn=0
 setlocal foldenable
@@ -223,7 +224,7 @@ setlocal foldminlines=1
 setlocal foldnestmax=20
 setlocal foldtext=foldtext()
 setlocal formatexpr=
-setlocal formatoptions=croql
+setlocal formatoptions=tcq
 setlocal formatlistpat=^\\s*\\d\\+[\\]:.)}\\t\ ]\\s*
 setlocal grepprg=
 setlocal iminsert=2
@@ -245,7 +246,7 @@ setlocal modifiable
 setlocal nrformats=octal,hex
 setlocal nonumber
 setlocal numberwidth=4
-setlocal omnifunc=ccomplete#Complete
+setlocal omnifunc=
 setlocal path=
 setlocal nopreserveindent
 setlocal nopreviewwindow
@@ -268,8 +269,8 @@ setlocal statusline=
 setlocal suffixesadd=
 setlocal swapfile
 setlocal synmaxcol=3000
-if &syntax != 'cpp'
-setlocal syntax=cpp
+if &syntax != 'text'
+setlocal syntax=text
 endif
 setlocal tabstop=2
 setlocal tags=
@@ -280,82 +281,16 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-18
-normal zc
-25
-normal zo
-25
-normal zc
-69
-normal zo
-69
-normal zc
-94
-normal zo
-104
-normal zo
-94
-normal zc
-119
-normal zc
-137
-normal zc
-165
-normal zo
-165
-normal zc
-196
-normal zo
-196
-normal zc
-226
-normal zo
-238
-normal zo
-226
-normal zc
-271
-normal zo
-283
-normal zo
-271
-normal zc
-313
-normal zo
-313
-normal zc
-337
-normal zo
-346
-normal zo
-337
-normal zc
-372
-normal zo
-372
-normal zc
-404
-normal zc
-425
-normal zc
-445
-normal zo
-451
-normal zo
-460
-normal zo
-445
-normal zc
-let s:l = 26 - ((8 * winheight(0) + 16) / 33)
+let s:l = 4 - ((3 * winheight(0) + 16) / 33)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-26
-normal! 03l
+4
+normal! 0
 wincmd w
 2wincmd w
-exe '1resize ' . ((&lines * 2 + 19) / 38)
-exe '2resize ' . ((&lines * 33 + 19) / 38)
+exe '1resize ' . ((&lines * 3 + 19) / 39)
+exe '2resize ' . ((&lines * 33 + 19) / 39)
 tabnext 1
 if exists('s:wipebuf')
   silent exe 'bwipe ' . s:wipebuf
