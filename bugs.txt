@@ -33,23 +33,6 @@ OCCURRENCE:
 Always.
 ===============================================================================
 DESCRIPTION:
-Pressing LEFT once will appear to do nothing. Upon the next keystroke,
-the cursor will first appear at the beginning of the line,
-then the latest keystroke will be executed.
---------------------
-OCCURRENCE:
-Always.
-===============================================================================
-DESCRIPTION:
-Pressing RIGHT will appear to move the cursor all the way right,
-to the position one past the end of the line.
-Typing from thereon makes the new characters appear by the cursor as
-expected.
---------------------
-OCCURRENCE:
-Always.
-===============================================================================
-DESCRIPTION:
 Pressing ENTER will not appear to create a new line.
 Instead it appears to move the cursor forward a space.
 However, if one types afterward, the placement of new characters

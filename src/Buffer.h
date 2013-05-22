@@ -47,30 +47,28 @@ class Buffer {
 
     // place cursor at beginning of line above.
     // stops at first line.
-    // returns number of lines moved up.
+    // makes no changes to file text
     std::unique_ptr<Changeset> do_up(const int &num_lines = 1);
 
     // place cursor at beginning of line below.
     // stops at last line.
-    // returns number of lines moved down.
+    // makes no changes to file text
     std::unique_ptr<Changeset> do_down(const int &num_lines = 1);
 
     // move the cursor left, possibly wrapping to previous line.
     // Stops at first position of first line.
-    // returns number of positions moved left.
+    // makes no changes to file text
     std::unique_ptr<Changeset> do_left(const int &num_moves = 1);
 
     // move the cursor right, possibly wrapping to next line.
     // Stops after last position of last line.
-    // returns number of positions moved right.
+    // makes no changes to file text
     std::unique_ptr<Changeset> do_right(const int &num_moves = 1);
 
     // perform necessary actions to handle pressing of BACKSPACE.
-    // return numbers of backspace operations performed successfully.
     std::unique_ptr<Changeset> do_backspace(const int &num_presses = 1);
 
     // perform necessary actions to handle pressing of DELETE.
-    // returns number of delete operations performed successfully.
     std::unique_ptr<Changeset> do_delete(const int &num_presses = 1);
 
     // perform necessary actions to handle pressing of ENTER.
@@ -79,10 +77,12 @@ class Buffer {
 
     // perform necessary actions to handle pressing of HOME.
     // place cursor on first character of line.
+    // makes no changes to file text
     std::unique_ptr<Changeset> do_home();
     
     // perform necessary actions to handle pressing of END.
     // place cursor after last character of line.
+    // makes no changes to file text
     std::unique_ptr<Changeset> do_end();
 
   private:
@@ -125,6 +125,10 @@ struct Buffer::Changeset {
   // include another Changeset's information in this one.
   void combine(const Changeset &other);
 
+  // find which cursor comes before or after the other.
+  Point &cursor_first();
+  Point &cursor_last();
+
   // changed lines.
   std::list<std::string> changed;
 
@@ -166,6 +170,33 @@ inline Line::iterator Buffer::local_first_char()
 inline Line::iterator Buffer::local_end_char()
 {
   return end(*line);
+}
+
+// find which cursor comes before or after the other.
+inline Point &Buffer::Changeset::cursor_first()
+{
+  if (cursor_orig.y < cursor_final.y) {
+    return cursor_orig;
+  } else if (cursor_final.y < cursor_orig.y) {
+    return cursor_final;
+  } else { // same y
+    if (cursor_orig.x < cursor_final.x) {
+      return cursor_orig;
+    } else {
+      return cursor_final;
+    }
+  }
+}
+
+inline Point &Buffer::Changeset::cursor_last()
+{
+  auto &first = cursor_first();
+  //TODO: overload == for Point
+  if (first.x == cursor_orig.x && first.y == cursor_orig.y) {
+    return cursor_final;
+  } else {
+    return cursor_orig;
+  }
 }
 
 #endif /* BUFFER_H */

@@ -71,7 +71,9 @@ Buffer::Changeset::Changeset(Line_list::iterator topln,
   Debug::indent();
   std::stringstream ss;
   ss << "constructing a Changeset";
-  ss << " from top line of length " << topln->size();
+  ss << "with cursors " << "(" << orig.x << "," << orig.y << ")";
+  ss << " -> ";
+  ss << "(" << final.x << "," << final.y << ").";
   Debug::log(ss.str());
   Debug::indent();
 #endif /* NDEBUG */
@@ -159,7 +161,7 @@ Buffer::insert(const int &character)
 
 // place cursor at beginning of line above.
 // stops at first line.
-// returns number of lines moved up.
+// makes no changes to file text
 std::unique_ptr<Buffer::Changeset>
 Buffer::do_up(const int &num_lines /* = 1 */)
 {
@@ -178,9 +180,8 @@ Buffer::do_up(const int &num_lines /* = 1 */)
   cursor = local_first_char();
   cursor_pos.x = 0;
 
-  // cursor positions reversed because things change upwards.
   std::unique_ptr<Changeset> ret(
-      new Changeset(line, moves, cursor_pos, orig_pos));
+      new Changeset(line, 0, orig_pos, cursor_pos));
 #ifndef NDEBUG
   Debug::log("finished performing do_up");
   Debug::outdent();
@@ -190,7 +191,7 @@ Buffer::do_up(const int &num_lines /* = 1 */)
 
 // place cursor at beginning of line below.
 // stops at last line.
-// returns number of lines moved down.
+// makes no changes to file text
 std::unique_ptr<Buffer::Changeset>
 Buffer::do_down(const int &num_lines /* = 1 */)
 {
@@ -201,6 +202,7 @@ Buffer::do_down(const int &num_lines /* = 1 */)
   Line_list::difference_type moves = 0;
   auto orig_pos = cursor_pos;
   auto endln = --end(lines);
+  auto top = line;
   while(moves < num_lines && line != endln) {
     ++line;
     ++moves;
@@ -210,7 +212,7 @@ Buffer::do_down(const int &num_lines /* = 1 */)
   cursor_pos.x = 0;
 
   std::unique_ptr<Changeset> ret(
-      new Changeset(line, moves, orig_pos, cursor_pos));
+      new Changeset(top, 0, orig_pos, cursor_pos));
 #ifndef NDEBUG
   Debug::log("finished performing do_down");
   Debug::outdent();
@@ -220,43 +222,49 @@ Buffer::do_down(const int &num_lines /* = 1 */)
 
 // move the cursor left, possibly wrapping to previous line.
 // Stops at first position of first line.
-// returns number of positions moved left.
+// makes no changes to file text
 std::unique_ptr<Buffer::Changeset>
 Buffer::do_left(const int &num_moves /* = 1 */)
 {
 #ifndef NDEBUG
   Debug::indent();
-  Debug::log("performing do_left");
+  std::stringstream ss;
+  ss << "performing do_left " << num_moves << " times.";
+  Debug::log(ss.str());
+  Debug::indent();
 #endif /* NDEBUG */
-  Line_list::difference_type taken = 0;
-  int wraps = 0;
+  Line_list::difference_type moves = 0;
   auto orig_pos = cursor_pos;
   // very first character
   auto first = very_first_char();
   // first character of this line
   auto local_first = local_first_char();
-  while (taken < num_moves && cursor != first) {
-    while (cursor != local_first) {
-      --cursor;
-      --cursor_pos.x;
-      ++taken;
-    }
+  while (moves < num_moves && cursor != first) {
     // if should wrap left, and can
-    if (taken < num_moves && cursor != first) {
+    if (cursor == local_first) {
+#ifndef NDEBUG
+  Debug::log("wrapping to upper line");
+#endif /* NDEBUG */
       --line;
       local_first = local_first_char();
       cursor = local_end_char();  // wrap over newline, but not next char.
       --cursor_pos.y;
       cursor_pos.x = line->size() - 1;
-      ++taken;
-      ++wraps;
+      ++moves;
+    } else { // else just move left
+#ifndef NDEBUG
+  Debug::log("moving left");
+#endif /* NDEBUG */
+      --cursor;
+      --cursor_pos.x;
+      ++moves;
     }
   }
-  // cursor positions reversed because things change upwards.
 
   std::unique_ptr<Changeset> ret(
-      new Changeset(line, wraps + 1, cursor_pos, orig_pos));
+      new Changeset(line, 0, orig_pos, cursor_pos));
 #ifndef NDEBUG
+  Debug::outdent();
   Debug::log("finished performing do_left");
   Debug::outdent();
 #endif /* NDEBUG */
@@ -265,41 +273,50 @@ Buffer::do_left(const int &num_moves /* = 1 */)
 
 // move the cursor right, possibly wrapping to next line.
 // Stops after last position of last line.
-// returns number of positions moved right.
+// makes no changes to file text
 std::unique_ptr<Buffer::Changeset>
 Buffer::do_right(const int &num_moves /* = 1 */)
 {
 #ifndef NDEBUG
   Debug::indent();
-  Debug::log("performing do_right");
+  std::stringstream ss;
+  ss << "performing do_right " << num_moves << " times.";
+  Debug::log(ss.str());
+  Debug::indent();
 #endif /* NDEBUG */
-  Line_list::difference_type taken = 0;
-  int wraps = 0;
+  Line_list::difference_type moves = 0;
   auto orig_pos = cursor_pos;
   // after very last character
   auto last = very_end_char();
   // after last character of this line
   auto local_last = local_end_char();
-  while (taken < num_moves && cursor != last) {
-    while (cursor != local_last) {
-      ++cursor;
-      ++cursor_pos.x;
-      ++taken;
-    }
+  while (moves < num_moves && cursor != last) {
     // if should wrap right, and can
-    if (taken < num_moves && cursor != last) {
+    if (cursor == local_last) {
+#ifndef NDEBUG
+  Debug::outdent();
+  Debug::log("wrapping to lower line");
+#endif /* NDEBUG */
       ++line;
       local_last = local_end_char();
       cursor = local_first_char();  // wrap over newline, but not next char.
       ++cursor_pos.y;
       cursor_pos.x = 0;
-      ++wraps;
+      ++moves;
+    } else { // else just move right
+#ifndef NDEBUG
+  Debug::log("moving right");
+#endif /* NDEBUG */
+      ++cursor;
+      ++cursor_pos.x;
+      ++moves;
     }
   }
 
   std::unique_ptr<Changeset> ret(
-      new Changeset(line, wraps + 1, orig_pos, cursor_pos));
+      new Changeset(line, 0, orig_pos, cursor_pos));
 #ifndef NDEBUG
+  Debug::outdent();
   Debug::log("finished performing do_right");
   Debug::outdent();
 #endif /* NDEBUG */
@@ -307,7 +324,6 @@ Buffer::do_right(const int &num_moves /* = 1 */)
 }
 
 // perform necessary actions to handle pressing of BACKSPACE.
-// return numbers of backspace operations performed successfully.
 std::unique_ptr<Buffer::Changeset>
 Buffer::do_backspace(const int &num_presses /* = 1 */)
 {
@@ -331,10 +347,10 @@ Buffer::do_backspace(const int &num_presses /* = 1 */)
 }
 
 // perform necessary actions to handle pressing of DELETE.
-// returns number of delete operations performed successfully.
 std::unique_ptr<Buffer::Changeset>
 Buffer::do_delete(const int &num_presses /* = 1 */)
 {
+  //TODO: update Window::update to work if lines are merged
 #ifndef NDEBUG
   Debug::indent();
   Debug::log("performing do_delete");
@@ -400,6 +416,7 @@ Buffer::do_enter(const int &num_presses /* = 1 */)
 
 // perform necessary actions to handle pressing of HOME.
 // place cursor on first character of line.
+// makes no changes to file text
 std::unique_ptr<Buffer::Changeset> Buffer::do_home()
 {
 #ifndef NDEBUG
@@ -421,6 +438,7 @@ std::unique_ptr<Buffer::Changeset> Buffer::do_home()
 
 // perform necessary actions to handle pressing of END.
 // place cursor after last character of line.
+// makes no changes to file text
 std::unique_ptr<Buffer::Changeset> Buffer::do_end()
 {
 #ifndef NDEBUG

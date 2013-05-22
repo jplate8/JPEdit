@@ -118,7 +118,7 @@ void Window::update(std::unique_ptr<Buffer::Changeset> change)
 {
   //TODO: add an options lookup table.
   //If a certain option is set, type each character in a random color.
-  int y = change->cursor_orig.y;
+  int y = change->cursor_first().y;
   for (std::string line : change->changed) {
     move(y, 0);
     clrtoeol();
