@@ -11,13 +11,15 @@ section, can put "Always." here.)
 ===============================================================================
 
 ===============================================================================
+===============================================================================
 DESCRIPTION:
-Pressing BACKSPACE followed by a different key will cause a segfault.
+Pressing BACKSPACE will not appear to do what it is supposed to do.
+Also, after pressing it, pressing ESC no longer works to exit.
 --------------------
 OCCURRENCE:
 Always.
-===============================================================================
 DESCRIPTION:
+===============================================================================
 Pressing ENTER will not appear to create a new line.
 Instead it appears to move the cursor forward a space.
 However, if one types afterward, the placement of new characters
