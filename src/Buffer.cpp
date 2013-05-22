@@ -357,7 +357,6 @@ Buffer::do_delete(const int &num_presses /* = 1 */)
 #endif /* NDEBUG */
   Line_list::difference_type num_done = 0;
   int wraps = 0;
-  auto orig_pos = cursor_pos;
   auto endln = very_end_char();
   while (cursor != endln && num_done < num_presses) {
     if (cursor == local_end_char()) {
@@ -366,14 +365,15 @@ Buffer::do_delete(const int &num_presses /* = 1 */)
       ++next;
       line->insert(cursor, begin(*next), end(*next));
     } else {
-      line->erase(cursor);
+      cursor = line->erase(cursor);
       // cursor ends up on element after one erased
     }
     ++num_done;
   }
 
+  // cursor doesn't move
   std::unique_ptr<Changeset> ret(
-      new Changeset(line, wraps, orig_pos, cursor_pos));
+      new Changeset(line, wraps + 1, cursor_pos, cursor_pos));
 #ifndef NDEBUG
   Debug::log("finished performing do_delete");
   Debug::outdent();

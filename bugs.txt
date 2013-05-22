@@ -11,21 +11,6 @@ section, can put "Always." here.)
 ===============================================================================
 
 ===============================================================================
-===============================================================================
-DESCRIPTION:
-Sometimes, pressing DELETE will cause a crash to occur, with some
-staggered lines output to the screen. 
---------------------
-OCCURRENCE:
-It seems to occur after some arrow keys have been pressed.
-Cursor appears at the beginning of the file when it happens.
-===============================================================================
-DESCRIPTION:
-Pressing DELETE will not appear to delete the item under the cursor.
---------------------
-OCCURRENCE:
-Always.
-===============================================================================
 DESCRIPTION:
 Pressing BACKSPACE followed by a different key will cause a segfault.
 --------------------
