@@ -114,11 +114,11 @@ Window::do_keystroke(const int &key, Buffer &front)
 }
 
 // update active ncurses window to reflect Buffer changes.
-void Window::update(std::unique_ptr<Buffer::Changeset> change)
+void Window::update(const std::unique_ptr<Buffer::Changeset> change)
 {
   //TODO: add an options lookup table.
   //If a certain option is set, type each character in a random color.
-  int y = change->cursor_first().y;
+  int y = change->top_line;
   for (std::string line : change->changed) {
     move(y, 0);
     clrtoeol();

@@ -122,23 +122,21 @@ struct Buffer::Changeset {
       Point orig,
       Point final);
 
-  // include another Changeset's information in this one.
-  void combine(const Changeset &other);
-
-  // find which cursor comes before or after the other.
-  Point &cursor_first();
-  Point &cursor_last();
-
   // changed lines.
   std::list<std::string> changed;
 
-  // starting (top) and final (bottom) positions of the cursor.
+  // starting and final positions of the cursor.
   Point cursor_orig;
   Point cursor_final;
 
-  private:
-    // used for combining.
-    Line_list::iterator top;
+  // top and bottom line numbers
+  int top_line;
+  int bottom_line;
+
+  // append another Changeset to this one, so that this one includes
+  // information from both. Other's cursor must start where this one's ends.
+// invalidates the other Changeset.
+  void append(Changeset &other);
 };
 
 // position of first character on first line.
@@ -170,33 +168,6 @@ inline Line::iterator Buffer::local_first_char()
 inline Line::iterator Buffer::local_end_char()
 {
   return end(*line);
-}
-
-// find which cursor comes before or after the other.
-inline Point &Buffer::Changeset::cursor_first()
-{
-  if (cursor_orig.y < cursor_final.y) {
-    return cursor_orig;
-  } else if (cursor_final.y < cursor_orig.y) {
-    return cursor_final;
-  } else { // same y
-    if (cursor_orig.x < cursor_final.x) {
-      return cursor_orig;
-    } else {
-      return cursor_final;
-    }
-  }
-}
-
-inline Point &Buffer::Changeset::cursor_last()
-{
-  auto &first = cursor_first();
-  //TODO: overload == for Point
-  if (first.x == cursor_orig.x && first.y == cursor_orig.y) {
-    return cursor_final;
-  } else {
-    return cursor_orig;
-  }
 }
 
 #endif /* BUFFER_H */

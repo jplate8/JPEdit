@@ -46,7 +46,7 @@ class Window {
     do_keystroke(const int &key, Buffer &front);
 
     // update active ncurses window to reflect Buffer changes.
-    void update(std::unique_ptr<Buffer::Changeset> change);
+    void update(const std::unique_ptr<Buffer::Changeset> change);
 };
 
 #endif /* WINDOW_H */

@@ -7,6 +7,7 @@
 #include <list>
 
 #include "Buffer.h"
+#include "Utility.h"
 
 #ifndef NDEBUG
 #include "Debug.h"
@@ -65,13 +66,16 @@ Buffer::Changeset::Changeset(Line_list::iterator topln,
                              Line_list::difference_type lines_edited,
                              Point orig,
                              Point final) :
-  cursor_orig(orig), cursor_final(final), top(topln)
+  cursor_orig(orig),
+  cursor_final(final),
+  top_line(utility::min(orig.y, final.y)),
+  bottom_line(utility::max(orig.y, final.y))
 {
 #ifndef NDEBUG
   Debug::indent();
   std::stringstream ss;
   ss << "constructing a Changeset";
-  ss << "with cursors " << "(" << orig.x << "," << orig.y << ")";
+  ss << " with cursors " << "(" << orig.x << "," << orig.y << ")";
   ss << " -> ";
   ss << "(" << final.x << "," << final.y << ").";
   Debug::log(ss.str());
@@ -87,7 +91,7 @@ Buffer::Changeset::Changeset(Line_list::iterator topln,
   }
 #ifndef NDEBUG
   Debug::outdent();
-  Debug::log("entering editing loop...");
+  Debug::log("finished constructing a Changeset");
   Debug::outdent();
 #endif /* NDEBUG */
 }
@@ -336,8 +340,9 @@ Buffer::do_backspace(const int &num_presses /* = 1 */)
     new Changeset(line, 0, cursor_pos, cursor_pos));
   auto first = very_first_char();
   while (cursor != first && num_done < num_presses) {
-    ret->combine(*do_left());
-    ret->combine(*do_delete());
+    ret->append(*do_left());
+    ret->append(*do_delete());
+    ++num_done;
   }
 #ifndef NDEBUG
   Debug::log("finished performing do_backspace");
@@ -458,35 +463,108 @@ std::unique_ptr<Buffer::Changeset> Buffer::do_end()
 #endif /* NDEBUG */
 }
 
-// include another Changeset's information in this one.
-void Buffer::Changeset::combine(const Changeset &other)
+// append another Changeset to this one, so that this one includes
+// information from both. Other's cursor must start where this one's ends.
+// invalidates the other Changeset.
+void Buffer::Changeset::append(Changeset &other)
 {
 #ifndef NDEBUG
   Debug::indent();
-  Debug::log("performing combine");
+  Debug::log("performing append");
+  Debug::indent();
 #endif /* NDEBUG */
-  // if stuff to add on top
-  if (cursor_orig.y > other.cursor_final.y) {
-    auto ln = other.top;
-    cursor_orig = other.cursor_orig;
-    while (ln != top) {
-      changed.emplace_front(begin(*ln), end(*ln));
-    }
-  }
-
-  // if stuff to add on bottom
-  if (cursor_final.y < other.cursor_final.y) {
-    auto endln = top;
-    for (int i = cursor_orig.y; i <= cursor_final.y; ++i) {
-      ++endln;
-    }
-
-    while (endln != other.top) {
-      changed.emplace_back(begin(*endln), end(*endln));
-    }
-  }
+  if (cursor_final != other.cursor_orig) {
 #ifndef NDEBUG
-  Debug::log("finished performing combine");
+    Debug::outdent();
+  Debug::log("finished performing append: nonadjacent input received");
+    Debug::outdent();
+#endif /* NDEBUG */
+    return;
+  }
+
+  int lowest_top = utility::max(top_line, other.top_line);
+  int highest_bottom = utility::min(bottom_line, other.bottom_line);
+
+  // replace overlapping section with other's
+  if ((lowest_top < highest_bottom) ||
+      ((top_line == bottom_line) &&
+       (other.top_line == other.bottom_line))) {
+#ifndef NDEBUG
+  Debug::log("replacing overlapping section");
+#endif /* NDEBUG */
+    auto overlap_top_this = begin(changed),
+         overlap_bottom_this = end(changed),
+         overlap_top_other = begin(other.changed),
+         overlap_bottom_other = end(other.changed);
+    // position top_this
+    for (int i = top_line; i < lowest_top; ++i) {
+      ++overlap_top_this;
+    }
+    // position top_other
+    for (int i = other.top_line; i < lowest_top; ++i) {
+      ++overlap_top_other;
+    }
+    // position bottom_this
+    for (int i = bottom_line; i > highest_bottom; --i) {
+      --overlap_bottom_this;
+    }
+    // position bottom_other
+    for (int i = other.bottom_line; i > highest_bottom; --i) {
+      --overlap_bottom_other;
+    }
+    
+    // delete old section
+    changed.erase(overlap_top_this, overlap_bottom_this);
+    // insert new section
+    changed.splice(overlap_top_this,
+                   other.changed,
+                   overlap_top_other,
+                   overlap_bottom_other);
+  }
+
+  // prepend extra beginning section
+  if (other.top_line < top_line) {
+#ifndef NDEBUG
+  Debug::log("prepending section");
+#endif /* NDEBUG */
+    auto prepend_bottom_other = begin(other.changed);
+    // position bottom_other
+    for (int i = other.top_line; i < top_line; ++i) {
+      ++prepend_bottom_other;
+    }
+
+    // prepend section
+    changed.splice(begin(changed),
+                   other.changed,
+                   begin(other.changed),
+                   prepend_bottom_other);
+  }
+
+  // append extra ending section
+  if (bottom_line < other.bottom_line) {
+#ifndef NDEBUG
+  Debug::log("appending section");
+#endif /* NDEBUG */
+    auto append_top_other = end(other.changed);
+    // position top_other
+    for (int i = other.bottom_line; i > bottom_line; --i) {
+      --append_top_other;
+    }
+
+    // append section
+    changed.splice(end(changed),
+                   other.changed,
+                   append_top_other,
+                   end(other.changed));
+  }
+
+  top_line = utility::min(top_line, other.top_line);
+  bottom_line = utility::max(bottom_line, other.bottom_line);
+  cursor_final = other.cursor_final;
+
+#ifndef NDEBUG
+  Debug::outdent();
+  Debug::log("finished performing append");
   Debug::outdent();
 #endif /* NDEBUG */
 }
