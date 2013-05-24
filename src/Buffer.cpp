@@ -253,7 +253,7 @@ Buffer::do_left(const int &num_moves /* = 1 */)
       local_first = local_first_char();
       cursor = local_end_char();  // wrap over newline, but not next char.
       --cursor_pos.y;
-      cursor_pos.x = line->size() - 1;
+      cursor_pos.x = line->size();
       ++moves;
     } else { // else just move left
 #ifndef NDEBUG

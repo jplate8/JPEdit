@@ -13,8 +13,8 @@ section, can put "Always." here.)
 ===============================================================================
 ===============================================================================
 DESCRIPTION:
-After wrapping over a line with LEFT, the cursor appears one space
-to the left of where it actually is.
+When pressing DOWN or UP, instead of going to the position immediately
+above or below, it goes to the beginning of the line.
 --------------------
 OCCURRENCE:
 Always.
