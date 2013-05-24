@@ -69,7 +69,9 @@ Window::do_keystroke(const int &key, Buffer &front)
 #ifndef NDEBUG
   Debug::indent();
   std::stringstream ss;
-  ss << "performing keystroke for " << static_cast<char>(key);
+  ss << "performing keystroke for ";
+  ss << key;
+  ss << ", aka " << static_cast<char>(key);
   Debug::log(ss.str());
   Debug::outdent();
 #endif /* NDEBUG */
@@ -95,7 +97,7 @@ Window::do_keystroke(const int &key, Buffer &front)
     case KEY_DC:
       return front.do_delete();
       break;
-    case KEY_ENTER:
+    case '\n': // KEY_ENTER is for keypad enter
       return front.do_enter();
       break;
     case KEY_HOME:

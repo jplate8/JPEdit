@@ -394,25 +394,31 @@ Buffer::do_enter(const int &num_presses /* = 1 */)
 #ifndef NDEBUG
   Debug::indent();
   Debug::log("performing do_enter");
+  Debug::indent();
 #endif /* NDEBUG */
   Line_list::difference_type num_done = 0;
   auto orig_pos = cursor_pos;
+  auto top = line;
   while (num_done < num_presses) {
+#ifndef NDEBUG
+  Debug::log("doing an enter");
+#endif /* NDEBUG */
     auto curr_end = local_end_char();
-    // cursor can never be past end of line, so always safe to increment.
+    // cursor can never be past end of lines, so always safe to increment.
     ++line;
     ++cursor_pos.y;
     // insert line after cursor's one that has all elements from
     // current cursor position to end of line.
-    lines.emplace(line, cursor, curr_end);
+    line = lines.emplace(line, cursor, curr_end);
     cursor = local_first_char();
     ++num_done;
   }
   cursor_pos.x = 0;
 
   std::unique_ptr<Changeset> ret(
-      new Changeset(line, num_done, orig_pos, cursor_pos));
+      new Changeset(top, num_done + 1, orig_pos, cursor_pos));
 #ifndef NDEBUG
+  Debug::outdent();
   Debug::log("finished performing do_enter");
   Debug::outdent();
 #endif /* NDEBUG */
