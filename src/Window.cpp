@@ -97,7 +97,8 @@ Window::do_keystroke(const int &key, Buffer &front)
     case KEY_DC:
       return front.do_delete();
       break;
-    case '\n': // KEY_ENTER is for keypad enter
+    case '\n':
+    case KEY_ENTER: // for keypad enter
       return front.do_enter();
       break;
     case KEY_HOME:
