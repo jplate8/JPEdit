@@ -42,6 +42,9 @@ void Window::edit_text()
     Debug::log("starting an editing iteration");
 #endif /* NDEBUG */
     last_key = wgetch(active_window);
+#ifndef NDEBUG
+  Debug::log("got key");
+#endif /* NDEBUG */
     if (last_key != ERR) {
       last_change = do_keystroke(last_key, front);
       if (last_change != nullptr) {
@@ -108,6 +111,9 @@ Window::do_keystroke(const int &key, Buffer &front)
       return front.do_end();
       break;
     case KEY_ESC:
+#ifndef NDEBUG
+  Debug::log("Received ESC");
+#endif /* NDEBUG */
       return nullptr;
       break;
     default:

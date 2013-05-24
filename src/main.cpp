@@ -20,6 +20,7 @@ int main(int argc, char *argv[])
   }
 
   start_editor(first);
+  //old_start_editor();
 
   return 0;
 }
@@ -47,7 +48,7 @@ void start_editor(const std::string &path)
   // make keypresses immediately. let interrupt sequences still work.
   cbreak();
   // set timeout for ESC
-  timeout(100);
+  //timeout(100);
   // allow arrow keys, function keys, etc.
   // TODO: when using multiple screens, do this for all of them.
   keypad(stdscr, true);

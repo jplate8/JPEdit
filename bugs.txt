@@ -12,10 +12,8 @@ section, can put "Always." here.)
 
 ===============================================================================
 ===============================================================================
-Pressing ENTER will not appear to create a new line.
-Instead it appears to move the cursor forward a space.
-However, if one types afterward, the placement of new characters
-appears to be affected (just not the cursor).
+Pressing ENTER will cause remaining characters to appear on the line below,
+but it does not disappear from the line it is being moved from.
 --------------------
 OCCURRENCE:
 Always.
