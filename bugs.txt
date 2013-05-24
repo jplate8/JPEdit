@@ -12,8 +12,10 @@ section, can put "Always." here.)
 
 ===============================================================================
 ===============================================================================
-Pressing ENTER will cause remaining characters to appear on the line below,
-but it does not disappear from the line it is being moved from.
+DESCRIPTION:
+Pressing END will bring the cursor to the last character,
+as opposed to the position after it. After pressing it,
+pressing RIGHT does not move to the position after last character.
 --------------------
 OCCURRENCE:
 Always.

@@ -407,9 +407,12 @@ Buffer::do_enter(const int &num_presses /* = 1 */)
     // cursor can never be past end of lines, so always safe to increment.
     ++line;
     ++cursor_pos.y;
-    // insert line after cursor's one that has all elements from
-    // current cursor position to end of line.
-    line = lines.emplace(line, cursor, curr_end);
+    // insert empty line
+    line = lines.emplace(line);
+    // move over old elements
+    auto dest = line--;
+    dest->splice(begin(*dest), *line, cursor, end(*line));
+    ++line;
     cursor = local_first_char();
     ++num_done;
   }

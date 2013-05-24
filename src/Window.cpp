@@ -111,9 +111,6 @@ Window::do_keystroke(const int &key, Buffer &front)
       return front.do_end();
       break;
     case KEY_ESC:
-#ifndef NDEBUG
-  Debug::log("Received ESC");
-#endif /* NDEBUG */
       return nullptr;
       break;
     default:
