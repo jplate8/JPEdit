@@ -461,7 +461,7 @@ std::unique_ptr<Buffer::Changeset> Buffer::do_end()
 #endif /* NDEBUG */
   auto orig_pos = cursor_pos;
   cursor = local_end_char();
-  cursor_pos.x = line->size() - 1;
+  cursor_pos.x = line->size();
 
   std::unique_ptr<Changeset> ret(
       new Changeset(line, 0, orig_pos, cursor_pos));

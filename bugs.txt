@@ -13,9 +13,8 @@ section, can put "Always." here.)
 ===============================================================================
 ===============================================================================
 DESCRIPTION:
-Pressing END will bring the cursor to the last character,
-as opposed to the position after it. After pressing it,
-pressing RIGHT does not move to the position after last character.
+After wrapping over a line with LEFT, the cursor appears one space
+to the left of where it actually is.
 --------------------
 OCCURRENCE:
 Always.
